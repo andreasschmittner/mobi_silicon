@@ -1,3 +1,167 @@
+Nov 15, 2020: remove O_kk_si_compensating_sources, O_kk_variable_sipr 
+   and O_kk_si options for test with Kiel version
+   o_diat similar patters but much larger values (80) compared to Kiel version (0.003)	
+   o_diatnpp is smaller, thus can't be the reason for larger o_diat
+   o_diatgraz, o_diatmort and o_diatrecy are smaller by 10^2, so this can be the reason
+   switch of n15, c13 and c14 isotopes
+   fixed rgraz_Diat, rnpp_Diat ... statements in npzd_src.F
+   now o_diat ~1 (but it shouldn't have been affected by the rgraz statements, which only change the output)
+   but now o_diatgraz = 0 	and o_diatnpp=e-19
+
+Nov 16: fixd diatnpp_dop output 
+   but diatnpp still ~e-19 much smaller than phytnpp ~10-9
+   O_npzd_extra_diagnostics seems broken (netcdf error putvaramsk O_wcdeni)
+   but only in combination with O_iron_diagnostics
+
+Nov 17: fixed zpref
+    test with converting diatoms to calcifiers
+    mort, morpt and graz of diatoms all zero in output
+    fixed error in npzd.h and now diatoms are identical to coccs :-)
+
+Nov 18: adopting Karin's parameters for diatoms seems to 
+    with constant kfe_Diat Diatoms dominate
+    with variable kfevar_Diat they are less dominant
+
+Nov 19: 1-year test run with variable kfevars
+   1-year test run with Karen's parameters in const_kfe/karen
+	this leads to total phytoplankton domination
+   try to tune kfe in const_kfe to get more equal PFT distributions
+
+   converting only one PFT (phyt) to variale kfe increases its biomass everywhere, both 
+   in oligotrophic and eutrophic regions. This is kind of interesting as it indicates
+   variable kfe makes a PFT more competitive (perhaps not surprising)
+
+Nov 20: 100-yr tests with constant and variable kfe all result in diatoms retreating 
+   into the subtropics, while phyt dominate including the high latitude SO
+
+   decrease kfemax for coccs and diatoms from 0.6 and 1.5 to 0.5 and 1
+Nov 21: this leads to less dominance for phyt, more diat is SO and coccs dominate subtropics
+   strongly negative values for diat develop after ~year 5
+
+   remove si limitation for diat in npzd_src.F to make all phytoplankton identical
+   small differences (e-7) remain between diat and phyt, whereas phyt and cocc are identical
+   pattern looks like freshwater fluxes
+   fixed error in gasbc.F
+   diat and phyt identical :-) (after 30 days) 
+   integrating longer leads to differences
+   diaz negative
+
+Nov 23: cocc and phyt diverge after about year 20. Seem identical before that. Strange. 
+   larger initial differences between phyt and diat despite identical parameters.
+   One solution could be to add an array for all phytplankton in MOBI to guarantee each
+   PFT is treated exactly the same way. It may also be useful for future PFT additions.
+
+   recompile
+   mv tavg.00010.01.01.nc tavg.00010.01.01.nc.1
+   start new run
+
+Dec 4: set all kefemin=kefemax=0.1e-3
+	diaz still go extinct quickly
+	set u_D=u_P
+	this leads to diaz domination!
+	revert back to u_D =\= u_P but with jdiar=1
+	now diaz smaller than phyt but nonzero
+
+Dec 7: replace 2.6 with dbct_D in npzd_src.F
+   introduce kirr for light limitation
+   diaz distribution looks OK
+   cp O_diffac.nc, O_tidenrg_green and O_feflux from 07
+
+Dec 8: make diaz like phyt, use same morp and morpt formulation and add no3flag to NPP
+    and set dbct_D=0 and jdiar=1. This works. Now all pfts are identical. (eqal_pfts)
+
+    Back to test_08: this is a good starting point. The differences between phyt and diaz
+    are only due to the things mentioned in the above paragraph.
+
+    Now change diatoms: increase abio, k1n and kfe
+    diat1: diat dominate at high latitudes
+    diat2: increase k1n and kfe for phyt and cocc leads to dominance of diatoms almost
+           everywhere except in the subtropical gyres
+	   both diat1 and diat2 have increasing surface NO3, PO4 and DFe indicating too little
+	   productivity
+    diat3: increase abio: only makes surface nutr increase larger
+    diat2.1: include Si limitation: minimal effect. Why?
+	Because k1si is too small in Aumont et al. 2003 formulation (no Si limitation anywhere)
+	This is because Si varies from ~0.5 to 50 mmol/m3 and for Si = 1 k1si = 1 and for
+	Si = 10 k1si = 2.6
+	I just set k1si = 5, which leads to Si limitation in the subtropics
+
+
+Dec 9: P is conserved (pl_ocean_P_budget_diat)
+   run diat2.1 longer, surface NO3, PO4 too high
+   diat4: increase growth rates (abio)    
+          improves surface PO4 but not NO3
+
+Dec 10: fixed dfesur output in embm_tsi.F
+   diat5: increase growth rates
+          leads to diat much reduced
+   diat4.1: increase sinking spead to 20
+   	    better surface PO4, but still too low
+   diat4_si: switch on O_kk_si: crashes; crash is due to not all *.f files
+   	     properly updated in code. rm diago.f and mk e resolves the issue
+   	     cp tracer.F from ../si to remove hydrothermal and river sources
+	     model works, but shows small drift in Si
+	     sfc NO3, PO4 slightly too high, sfc Sil much too high
+
+Dec 11: 
+   diat4.2: wd0=25
+   diat4.3: wd0=30
+
+   check ropk calculation; different from rcak calculation
+
+   diat6: variable kfe for diatoms
+   diat6.1: variable kfe for diat, phyt & cocc
+
+Dec 12: Ward et al. 2012 LO suggest all nutrient half saturation constants
+    should depend on size. E.g. their table 2 has kn = 0.17*vol^0.27 where
+    vol is the cell volume in um^3. kfe = 80e-6*vol^0.27. Thus kn should
+    increase as kfe. For vol=10^0 (pico) kn=0.17, for vol=10^2 (nano) kn=0.59,
+    for vol=10^4 kn=2, for vol=10^6 (micro) kn=7. 
+    Sinking speed should also scale with size:
+    w = 0.28vol^0.39. At vol=10^0 w = 0.3, vol=10^2 w = 1.7, vol=10^4 w=10,
+    vol=10^6 w=61. Nutrient uptake (maximum growth) rates should decrease with 
+    size for each PFT (Fig. 3 in Ward). 
+
+Dec 14: To use model biomass in size dependent parameterizations I converted
+    the Ward x-axis into total phytoplankton biomass (see ferret/pl_kn_vol.jnl)
+    assuming a constant biomass density. But for a parameterization like the
+    one used in Nickelson kfe = (P1*kfemin+P2*kfemax)/(P1+P2) one needs PFT
+    biomass for P1 and P2. Not sure if this would work.
+
+    diat7: as diat6.1 but variable half sat for NO3: 
+    	   results almost identical to diat6.1
+	   this indicates no N-limitation
+
+Dec 15:
+   thetaZ in no nitrogen case should not have kzoo multiplied by redptn since
+   units are still in N! I've removed redptn there.
+
+Dec 18: 
+    diat7_si: as diat7 but with kk_si and tracer.F from diat4_si
+    works but PO4 in Arctic gets large negative values
+    start woring to include opal and to more Si calculation into npzd_src
+
+Dec 21: remove po4_in, no3_in, dic13_in and din15_in from mobi_driver call and 
+    replace by tnpzd(k,imobi*)
+
+questions for Chris:
+   in npzd_src is a line:
+   dopupt_D_flag = dopupt_flag
+   is this correct? Same flag for diazotrophs as for phyt
+
+questions for Karin:
+   k1n_C = 0.35 or k1p_C = 0.02 uM = 20 nM much larger than 4 nM suggested
+   by LeQuere et al. 2005
+   
+   dbct_D is inconsistently applied in npzd_src (once zero, once 2.6)
+
+   we could include variable diatom Si:C and Si:N due to Fe limitation
+   
+TODO: inconsistent units: DIC, ALK, O2, Si, OPL in mol/m^3, all other in mmol/m^3
+      re-write code so that all tracers use consistent units
+
+      simplify call of routines: right now many variables are explicitly listed as input/output 
+      this could be removed by using the corresponding variables from common blocks.
 Mar 4, 2021: copied from ../diat7_si
   remove O_kk_diat and O_kk_si from mk.in
   model compiles
