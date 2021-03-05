@@ -11,5 +11,11 @@ do we need those files?
 - [ ] check gosbc.F: O_kk_si_compensating_sources
 - [ ] check mom_rest.F: globalsilwflx
 - [ ] isotopes
+- [ ] inconsistent units: DIC, ALK, O2, Si, OPL in mol/m^3, all other in mmol/m^3
+      re-write code so that all tracers use consistent units
+- [ ] simplify call of routines: right now many variables are explicitly listed as input/output
+      this could be removed by using the corresponding variables from common blocks.
+### In Progress
+
 ### Completed  
 - [x] move calculation of omega out of O_save_carbon_carbonate_chem option
