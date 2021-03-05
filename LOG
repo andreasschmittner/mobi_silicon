@@ -162,6 +162,30 @@ TODO: inconsistent units: DIC, ALK, O2, Si, OPL in mol/m^3, all other in mmol/m^
 
       simplify call of routines: right now many variables are explicitly listed as input/output 
       this could be removed by using the corresponding variables from common blocks.
+diat7_si
+Jan 11, 2021: fixed O_sil initial conditions file
+	runs!
+	diatoms get negative at Amazon (freshwater?)
+Jan 12: much lower diat than ../diat7
+	check Si units in npzd_src 
+	change k1si to mol from mmol
+	diat looks good now
+	At month 7 large Si in tropics
+	opl gets negative at l=4
+	opl export is zero
+	caco3 dissolution rate negative
+Jan 13: fixed but in calciate dissolution
+    	max(0.,(1.-Omega_c)) to limit dissl > 0
+Mar 02: opal has right order of magnitude but decreases over time and surface 
+	values are too low
+	uses constant sinking speed (50 m/d) and dissolution rate for opal such
+	that e-folding depth = 6 km 
+	include bioopl = max(bioopl, trcmin) in npzd_src.F
+	this resolves the negative opl issue
+	set up longer run
+
+	replaced all O_kk_si and O_kk_diat with O_mobi_silicon
+ 
 Mar 4, 2021: copied from ../diat7_si
   remove O_kk_diat and O_kk_si from mk.in
   model compiles
