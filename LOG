@@ -205,3 +205,6 @@ Mar 4, 2021: copied from ../diat7_si
 	this fixes the negative Si issue and crash
   P is conserved :-)
 
+Mar 5: add opal export at bottom (rexpoopl) back to silica (mobi.F) 
+    mv output to .0
+    this seems to fix conservations issue o_opl+o_sil much more stable
