@@ -1,4 +1,4 @@
- &contrl init=.true., runlen=3650., rununits='days',
+ &contrl init=.true., runlen=365000., rununits='days',
          restrt=.true., runstep=3650000. /
  &tsteps dtts=108000., dtuv=1125., dtsf=1125.,
          dtatm=54000., namix=10, segtim=5. /
@@ -10,7 +10,7 @@
          dampts=30.,60.,
          dampdz=50.e2,50.e2 /
  &diagn  tsiint=10., tsiper=10.,
-         timavgint=30., timavgper=30.,
+         timavgint=36500., timavgper=365.,
          restint=36500.,
          tavgint=-365000., itavg=.true., tmbint=-365000., itmb=.true.,
          trmbint=-365000., itrmb=.true., tbtint=-365000., tbtper=-365.,
@@ -37,12 +37,12 @@
  &ice    /
  &veg    /
  &mtlm   BF=0.0 /
- &npzd   abio_P  =0.4, k1n     =0.2, kfemin     =0.02e-3, kfemax     =0.2e-3,
+ &mobi   abio_P  =0.4, k1n     =0.2, kfemin     =0.02e-3, kfemax     =0.2e-3,
 	 abio_C  =0.4, k1n_C   =0.2, kfemin_C   =0.02e-3, kfemax_C   =0.2e-3, 
          abiodiat=0.7, k1n_Diat=0.4, kfemin_Diat=0.04e-3, kfemax_Diat=0.4e-3,
 	 nup=0.03, nuc=0.03, nu_diat=0.03, nup_D=0.0001, nuz=0.06,
 	 nupt0=0.015, nuct0=0.015, nudt0=0.015, nupt0_D=0.015,
- 	 kfe_D=0.1e-3, wo0=50.,
+ 	 kfe_D=0.1e-3, wo0=50., sipr0=0.2
 	 zprefP=0.18, zprefC=0.18, zprefDiat=0.18, zprefDet=0.1, 
          zprefZ=0.18, zprefDiaz=0.18,  
  	 gbio=0.38, geZ=0.54, jdiar=1., sgbdfac=2., 

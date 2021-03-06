@@ -25,7 +25,7 @@
       real tmpijkm(1:imtm2,1:jmtm2,1:km)
 ! end IO for fe_hydr
 # endif
-      namelist /npzd/   alpha, kw, kc, abio_P, bbio, cbio, k1n, nup
+      namelist /mobi/   alpha, kw, kc, abio_P, bbio, cbio, k1n, nup
      &,                 gamma1, gbio, epsbio, nuz, nud0, dbct_D
      &,                 wd0, par, dtnpzd, redctn, ki, redptn, capr
      &,                 dcaco3, nupt0, redotn, jdiar, kzoo, geZ
@@ -217,9 +217,9 @@ c     juan: Levin's value was 0.1e-3
 # endif
 !     read namelist
       call getunit (ioun, 'control.in', 'f s r')
-      read  (ioun, npzd, end=108)
+      read  (ioun, mobi, end=108)
 108   continue
-      write (stdout, npzd)
+      write (stdout, mobi)
       call relunit (ioun)
 
 !     convert units of NPZD parameters to MOM units

@@ -204,7 +204,11 @@ Mar 4, 2021: copied from ../diat7_si
   limit si>0 in mobi.F 
 	this fixes the negative Si issue and crash
   P is conserved :-)
+  model is stable but Si has decreasing trend (conservation issue)
+  also surface Si is too high
 
 Mar 5: add opal export at bottom (rexpoopl) back to silica (mobi.F) 
     mv output to .0
     this seems to fix conservations issue o_opl+o_sil much more stable
+    increase sipr0 to 0.2 (from 0.13)
+    rename npzd namelist mobi (mobi.F)
