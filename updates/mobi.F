@@ -1435,6 +1435,7 @@ CSPKKK I've moved the silwflux stuff in kk's version to tracer.F
 c       endif
 c      enddo ! K loop
 c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers back into ocean
+      src(kmx,issil) = src(kmx,issil) + rexpoopl(kmx) !put the leftovers back into ocean
 #  endif
 
       return
