@@ -212,3 +212,8 @@ Mar 5: add opal export at bottom (rexpoopl) back to silica (mobi.F)
     this seems to fix conservations issue o_opl+o_sil much more stable
     increase sipr0 to 0.2 (from 0.13)
     rename npzd namelist mobi (mobi.F)
+Mar 9: O_sil_dep has months at k-index, but still seems to work
+  atmospheric silicon deposition is still on, which maybe what's causing 
+    the increasing Si trend
+Mar 10: much too large vertical ALK gradient
+

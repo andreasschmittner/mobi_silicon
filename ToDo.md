@@ -11,6 +11,7 @@ do we need those files?
 - [ ] check gosbc.F: O_kk_si_compensating_sources
 - [ ] check mom_rest.F: globalsilwflx
 - [ ] isotopes
+- [ ] include variable Si:C ratios due to Fe limitation
 - [ ] inconsistent units: DIC, ALK, O2, Si, OPL in mol/m^3, all other in mmol/m^3
       re-write code so that all tracers use consistent units
 - [ ] simplify call of routines: right now many variables are explicitly listed as input/output
