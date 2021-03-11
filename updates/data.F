@@ -23,6 +23,9 @@
 #if defined O_embm
       include "atm.h"
 #endif
+#if defined O_mobi_silicon
+      include "mobi.h"
+#endif
 
       c10 = 10.
       c100 = 100.
@@ -105,7 +108,7 @@
         elseif ( m .eq. isilflx ) then
 !         read atmospheric si deposition
           call get_tdsbc (n, 'O_sil_dep.nc', 'O_SIL_DEP', isilflx
-     &,     rdtdbc(n), c100, c0)
+     &,     rdtdbc(n), c100*sildustfluxfac, c0)
 #endif
 #if defined O_read_my_stf
         elseif ( m .eq. ihflx ) then

@@ -269,18 +269,16 @@
       common /npzd_r/ abiodiat, k1n_Diat, k1p_Diat, nu_diat, nudt0
       common /npzd_r/ alpha_Diat, k1si
       common /npzd_r/ kfe_Diat, si_msk(imt,jmt,km)      
-#  if defined O_mobi_silicon
       real sipr0, ropk, dopal, si_sol, si_h_sol, opl_disk0
-      real globalsilwflx, sildustflux, wo0, rivsil
+      real globalsilwflx, sildustflux, sildustfluxfac, wo0, rivsil
       real prop, bsi, wo
       real si_hydr
       common /npzd_r/ sipr0, ropk(km), dopal, si_sol, si_h_sol
-      common /npzd_r/ globalsilwflx, sildustflux, wo0, rivsil, opl_disk0
-      common /npzd_r/ prop, bsi(km), wo(km)
+      common /npzd_r/ globalsilwflx, sildustflux, sildustfluxfac
+      common /npzd_r/ prop, bsi(km), wo(km), wo0, rivsil, opl_disk0
       common /npzd_r/ si_hydr(imt,jmt,km)
       real            rexpoopl,     rdisopl,     rproopl
       common /npzd_r/ rexpoopl(km), rdisopl(km), rproopl(km)
-#  endif
 # endif
 # if defined O_save_npzd
       real rnpp, rgraz, rmorp, rmorpt, rmorz, rexcr, rremi, rexpo

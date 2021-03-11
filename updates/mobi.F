@@ -55,7 +55,7 @@
 # endif
 # if defined O_mobi_silicon
      &,                 abiodiat, k1n_Diat, nudt0,nu_diat, alpha_Diat
-     &,                 zprefDiat, k1si
+     &,                 zprefDiat, k1si, sildustfluxfac
 # endif
 # if defined O_mobi_silicon
      &,                 sipr0, dopal, si_sol, si_h_sol, opl_disk0, wo0
@@ -115,7 +115,6 @@
       nu_diat = 0.03  ! Specific mortality rate (diatoms) [1/day]
       nudt0 = 0.015  ! Specific mortality rate (diatoms) [1/day]
 !      redstn = 0.9375  ! S/N Redfield ratio
-#  if defined O_mobi_silicon
       wo0 = 50. !Opal sinking rate in m/d
 c      si_dis0 = 5.07e-7 !!S&G 2006 dissl rate per s
 c     the following was estimated from an assumed e-folding depth
@@ -125,7 +124,7 @@ c     z` = 6 km = wo0/si_dis0
       si_sol = 0.03 !global average solubility ratio of dust input 
       dopal = 60000.0  ! remineralisation depth of opal [cm]      
       sipr0 = 0.13  ! opal to carbon production ratio from Aumont et al GBC 2003
-#  endif
+      sildustfluxfac = 1. ! scaling factor for silicon dust flux
 # endif      
 # if defined O_kk_ballast
       bapr = 0.05 ! detritus to carbonate ratio [mg POC/mg PIC]

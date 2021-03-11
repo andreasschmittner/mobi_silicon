@@ -208,7 +208,7 @@ Mar 4, 2021: copied from ../diat7_si
   also surface Si is too high
 
 Mar 5: add opal export at bottom (rexpoopl) back to silica (mobi.F) 
-    mv output to .0
+    mv output to out0
     this seems to fix conservations issue o_opl+o_sil much more stable
     increase sipr0 to 0.2 (from 0.13)
     rename npzd namelist mobi (mobi.F)
@@ -216,4 +216,7 @@ Mar 9: O_sil_dep has months at k-index, but still seems to work
   atmospheric silicon deposition is still on, which maybe what's causing 
     the increasing Si trend
 Mar 10: much too large vertical ALK gradient
+	moved output to out1
+  introduce sildustfluxfac to scale or switch off atmospheric Si deposition
+  set to zero in control.in and decrease capr from 0.55 to 0.25
 

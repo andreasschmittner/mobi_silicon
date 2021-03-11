@@ -25,6 +25,9 @@
 # if defined O_embm
       include "atm.h"
 # endif
+#if defined O_mobi_silicon
+      include "mobi.h"
+#endif
       include "calendar.h"
       include "ctdbc.h"
       include "tmngr.h"
@@ -123,7 +126,7 @@
             elseif ( m .eq. isilflx ) then              
               if (k .eq. 1) print*, 'atmospheric silica deposition'
               call get_sbc (n, 'O_sil_dep.nc', 'O_SIL_DEP', id, im
-     &,         c100, c0)  
+     &,         c100*sildustfluxfac, c0)  
 # endif
 # if defined O_read_my_stf
               if (k .eq. 1) print*, 'heat flux'
