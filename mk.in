@@ -78,7 +78,7 @@ O_mobi_alk
 O_mobi_caco3
 #O_kk_ballast
 O_mobi_nitrogen
-#O_mobi_nitrogen_15
+O_mobi_nitrogen_15
 O_mobi_iron
 O_mobi_iron_diagnostics
 #O_mobi_no_vflux
@@ -112,7 +112,7 @@ O_mobi_silicon
 O_carbon
 #O_carbon_co2_2d
 #O_carbon_uncoupled
-#O_carbon_13
+O_carbon_13
 #O_carbon_13_coupled
 #O_carbon_14
 #O_carbon_14_coupled

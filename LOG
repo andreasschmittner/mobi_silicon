@@ -247,4 +247,5 @@ Mar 16, 2021: copied from ../nococcs
   switch on c13
   fix dic13_in in call to mobi_driver in tracer.F
   adjust calc_dc13.jnl with redctn=7
-
+  copied updates from noc_c13 and control.in from noc_n15
+  switch on c13 and n15
