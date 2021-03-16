@@ -494,9 +494,6 @@
             ta_rmorp_D(i,k,jj+1) = rnavgt*ta_rmorp_D(i,k,jj+1)
             ta_rmorpt_D(i,k,jj+1) = rnavgt*ta_rmorpt_D(i,k,jj+1)
             ta_rnfix(i,k,jj+1) = rnavgt*ta_rnfix(i,k,jj+1)
-#    if defined O_mobi_caco3
-            ta_rnpp_C_dop(i,k,jj+1) = rnavgt*ta_rnpp_C_dop(i,k,jj+1)  
-#    endif            
 #    if defined O_mobi_silicon
             ta_rnpp_Diat_dop(i,k,jj+1) = 
      &                             rnavgt*ta_rnpp_Diat_dop(i,k,jj+1)  
@@ -507,11 +504,6 @@
 #   endif
 #   if defined O_mobi_caco3
             ta_rprocal(i,k,jj+1) = rnavgt*ta_rprocal(i,k,jj+1)
-            ta_rcalatt(i,k,jj+1) = rnavgt*ta_rcalatt(i,k,jj+1)
-            ta_rnpp_C(i,k,jj+1) = rnavgt*ta_rnpp_C(i,k,jj+1)
-            ta_rgraz_C(i,k,jj+1) = rnavgt*ta_rgraz_C(i,k,jj+1)
-            ta_rmorp_C(i,k,jj+1) = rnavgt*ta_rmorp_C(i,k,jj+1)
-            ta_rmorpt_C(i,k,jj+1) = rnavgt*ta_rmorpt_C(i,k,jj+1)
 #   endif
 #   if defined O_mobi_silicon
             ta_rnpp_Diat(i,k,jj+1) = rnavgt*ta_rnpp_Diat(i,k,jj+1)
@@ -529,9 +521,6 @@
             ta_rfesed(i,k,jj+1) = rnavgt*ta_rfesed(i,k,jj+1)
             ta_rbfe(i,k,jj+1) = rnavgt*ta_rbfe(i,k,jj+1)
             ta_rfecol(i,k,jj+1) = rnavgt*ta_rfecol(i,k,jj+1)
-#     if defined O_mobi_caco3
-            ta_rdeffe_C(i,k,jj+1) = rnavgt*ta_rdeffe_C(i,k,jj+1)
-#     endif            
 #     if defined O_mobi_silicon
             ta_rdeffe_Diat(i,k,jj+1) = rnavgt*ta_rdeffe_Diat(i,k,jj+1)
 #     endif            
@@ -577,9 +566,9 @@
 #  if !defined O_mobi_caco3           
           ta_rprocal(i,jj+1) = rnavgt*ta_rprocal(i,jj+1)
 #  endif
-#   if defined O_mobi_silicon
-		  ta_rrivsil(i,jj+1) = rnavgt*ta_rrivsil(i,jj+1)           
-#   endif
+#  if defined O_mobi_silicon
+          ta_rrivsil(i,jj+1) = rnavgt*ta_rrivsil(i,jj+1)           
+#  endif
           ta_rsedrr(i,jj+1) = rnavgt*ta_rsedrr(i,jj+1)
         enddo
 #  endif
@@ -702,18 +691,13 @@
      &,   ta_rmorp_D(is,1,jj+1), ta_rmorpt_D(is,1,jj+1)
      &,   ta_rnfix(is,1,jj+1), ta_rwcdeni(is,1,jj+1)
      &,   ta_rbdeni(is,1,jj+1) 
-#    if defined O_mobi_caco3
-     &,   ta_rnpp_C_dop(is,1,jj+1)
-#    endif        
 #    if defined O_mobi_silicon
      &,   ta_rnpp_Diat_dop(is,1,jj+1)
 #    endif        
 #   endif
 #   if defined O_mobi_caco3
-     &,   ta_rnpp_C(is,1,jj+1), ta_rgraz_C(is,1,jj+1)
-     &,   ta_rmorp_C(is,1,jj+1), ta_rmorpt_C(is,1,jj+1)
      &,   ta_rdissl(is,1,jj+1),   ta_rexpocaco3(is,1,jj+1)
-     &,   ta_rcalatt(is,1,jj+1),   ta_romega_c(is,1,jj+1)
+     &,   ta_romega_c(is,1,jj+1)
 #   endif
 #   if defined O_mobi_silicon
      &,   ta_rnpp_Diat(is,1,jj+1), ta_rgraz_Diat(is,1,jj+1)
@@ -732,9 +716,6 @@ c     &,   ta_rbur_sil(is,1,jj+1)
      &,   ta_rdeffe(is,1,jj+1), ta_rfeprime(is,1,jj+1)
      &,   ta_rfesed(is,1,jj+1), ta_rbfe(is,1,jj+1)
      &,   ta_rfecol(is,1,jj+1)
-#     if defined O_mobi_caco3
-     &,   ta_rdeffe_C(is,1,jj+1)
-#     endif
 #     if defined O_mobi_silicon
      &,   ta_rdeffe_Diat(is,1,jj+1)
 #     endif
@@ -832,9 +813,6 @@ c     &,   ta_rbur_sil(is,1,jj+1)
       ta_rwcdeni(:,:,:) = c0
       ta_rbdeni(:,:,:) = c0
       ta_rnfix(:,:,:) = c0
-#    if defined O_mobi_caco3
-      ta_rnpp_C_dop(:,:,:) = c0
-#    endif      
 #    if defined O_mobi_silicon
       ta_rnpp_Diat_dop(:,:,:) = c0
 #    endif      
@@ -849,9 +827,6 @@ c     &,   ta_rbur_sil(is,1,jj+1)
       ta_rfesed(:,:,:) = c0
       ta_rbfe(:,:,:) = c0 
       ta_rfecol(:,:,:) = c0 
-#     if defined O_mobi_caco3
-      ta_rdeffe_C(:,:,:) = c0
-#     endif      
 #     if defined O_mobi_silicon
       ta_rdeffe_Diat(:,:,:) = c0
 #     endif      
@@ -863,14 +838,9 @@ c     &,   ta_rbur_sil(is,1,jj+1)
       ta_rremi_B(:,:,:) = c0
 #   endif
 #   if defined O_mobi_caco3
-      ta_rcalatt(:,:,:) = c0
       ta_rdissl(:,:,:) = c0
       ta_romega_c(:,:,:) = c0
       ta_rexpocaco3(:,:,:) = c0
-      ta_rnpp_C(:,:,:) = c0
-      ta_rgraz_C(:,:,:) = c0
-      ta_rmorp_C(:,:,:) = c0
-      ta_rmorpt_C(:,:,:) = c0
       ta_rprocal(:,:,:) = c0
 #   else
       ta_rprocal(:,:) = c0
@@ -1010,9 +980,6 @@ c      ta_rbur_sil(:,:,:) = c0
       ta_rnfix(:,:,:) = c0
       ta_rwcdeni(:,:,:) = c0
       ta_rbdeni(:,:,:) = c0
-#    if defined O_mobi_caco3
-      ta_rnpp_C_dop(:,:,:) = c0
-#    endif
 #    if defined O_mobi_silicon
       ta_rnpp_Diat_dop(:,:,:) = c0
 #    endif
@@ -1027,23 +994,15 @@ c      ta_rbur_sil(:,:,:) = c0
       ta_rfesed(:,:,:) = c0
       ta_rbfe(:,:,:) = c0
       ta_rfecol(:,:,:) = c0
-#     if defined O_mobi_caco3
-      ta_rdeffe_C(:,:,:) = c0
-#     endif
 #     if defined O_mobi_silicon
       ta_rdeffe_Diat(:,:,:) = c0
 #     endif
 #    endif
 #   endif
 #   if defined O_mobi_caco3
-      ta_rcalatt(:,:,:) = c0
       ta_rdissl(:,:,:) = c0
       ta_romega_c(:,:,:) = c0
       ta_rexpocaco3(:,:,:) = c0      
-      ta_rnpp_C(:,:,:) = c0
-      ta_rgraz_C(:,:,:) = c0
-      ta_rmorp_C(:,:,:) = c0
-      ta_rmorpt_C(:,:,:) = c0
       ta_rprocal(:,:,:) = c0
 #   else
       ta_rprocal(:,:) = c0

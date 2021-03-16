@@ -317,14 +317,12 @@
             if (inqvardef('cfc111', iou)) var1 = 'cfc111'
           elseif (trim(mapt(n)) .eq. 'cfc12') then
             if (inqvardef('cfc121', iou)) var1 = 'cfc121'
-          elseif (trim(mapt(n)) .eq. 'cocc') then
-            if (inqvardef('cocc1', iou)) var1 = 'cocc1'
-          elseif (trim(mapt(n)) .eq. 'coccn15') then
-            if (inqvardef('coccn151', iou)) var1 = 'coccn151'
+          elseif (trim(mapt(n)) .eq. 'diatn15') then
+            if (inqvardef('diatn151', iou)) var1 = 'diatn151'
           elseif (trim(mapt(n)) .eq. 'caco3') then
             if (inqvardef('caco31', iou)) var1 = 'caco31'
-          elseif (trim(mapt(n)) .eq. 'coccc13') then
-            if (inqvardef('coccc131', iou)) var1 = 'coccc131'
+          elseif (trim(mapt(n)) .eq. 'diatc13') then
+            if (inqvardef('diatc131', iou)) var1 = 'diatc131'
           elseif (trim(mapt(n)) .eq. 'caco3c13') then
             if (inqvardef('caco3c131', iou)) var1 = 'caco3c131'
           elseif (trim(mapt(n)) .eq. 'detr_B') then
@@ -459,14 +457,12 @@
             if (inqvardef('cfc112', iou)) var2 = 'cfc112'
           elseif (trim(mapt(n)) .eq. 'cfc12') then
             if (inqvardef('cfc122', iou)) var2 = 'cfc122'
-          elseif (trim(mapt(n)) .eq. 'cocc') then
-            if (inqvardef('cocc2', iou)) var2 = 'cocc2'
-          elseif (trim(mapt(n)) .eq. 'coccn15') then
-            if (inqvardef('coccn152', iou)) var2 = 'coccn152'
+          elseif (trim(mapt(n)) .eq. 'diatn15') then
+            if (inqvardef('diatn152', iou)) var2 = 'diatn152'
           elseif (trim(mapt(n)) .eq. 'caco3') then
             if (inqvardef('caco32', iou)) var2 = 'caco32'
-          elseif (trim(mapt(n)) .eq. 'coccc13') then
-            if (inqvardef('coccc132', iou)) var2 = 'coccc132'
+          elseif (trim(mapt(n)) .eq. 'diatc13') then
+            if (inqvardef('diatc132', iou)) var2 = 'diatc132'
           elseif (trim(mapt(n)) .eq. 'caco3c13') then
             if (inqvardef('caco3c132', iou)) var2 = 'caco3c132'
           elseif (trim(mapt(n)) .eq. 'detr_B') then
@@ -888,26 +884,21 @@
      &,     'CFC12 at tau', ' ', ' ')
           call defvar ('cfc122', iou, 4, it, -c1e20, c1e20, ' ', 'D'
      &,     'CFC12 at tau+1', ' ', ' ')
-        elseif (trim(mapt(n)) .eq. 'cocc') then
-          call defvar ('cocc1', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores at tau', ' ', ' ')
-          call defvar ('cocc2', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores at tau+1', ' ', ' ')
-        elseif (trim(mapt(n)) .eq. 'coccn15') then
-          call defvar ('coccn151', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores n15 at tau', ' ', ' ')
-          call defvar ('coccn152', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores n15 at tau+1', ' ', ' ')
+        elseif (trim(mapt(n)) .eq. 'diatn15') then
+          call defvar ('diatn151', iou, 4, it, -c1e20, c1e20, ' ', 'D'
+     &,     'diatom n15 at tau', ' ', ' ')
+          call defvar ('diatn152', iou, 4, it, -c1e20, c1e20, ' ', 'D'
+     &,     'diatom n15 at tau+1', ' ', ' ')
         elseif (trim(mapt(n)) .eq. 'caco3') then
           call defvar ('caco31', iou, 4, it, -c1e20, c1e20, ' ', 'D'
      &,     'calcite at tau', ' ', ' ')
           call defvar ('caco32', iou, 4, it, -c1e20, c1e20, ' ','D'
      &,     'calcite at tau+1', ' ', ' ')
-        elseif (trim(mapt(n)) .eq. 'coccc13') then
-          call defvar ('coccc131', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores c13 at tau', ' ', ' ')
-          call defvar ('coccc132', iou, 4, it, -c1e20, c1e20, ' ', 'D'
-     &,     'coccolithophores c13 at tau+1', ' ', ' ')
+        elseif (trim(mapt(n)) .eq. 'diatc13') then
+          call defvar ('diatc131', iou, 4, it, -c1e20, c1e20, ' ', 'D'
+     &,     'diatom c13 at tau', ' ', ' ')
+          call defvar ('diatc132', iou, 4, it, -c1e20, c1e20, ' ', 'D'
+     &,     'diatom c13 at tau+1', ' ', ' ')
         elseif (trim(mapt(n)) .eq. 'caco3c13') then
           call defvar ('caco3c131', iou, 4, it, -c1e20, c1e20, ' ', 'D'
      &,     'calcite c13 at tau', ' ', ' ')
@@ -1344,14 +1335,12 @@
             var1 = 'cfc111'
           elseif (trim(mapt(n)) .eq. 'cfc12') then
             var1 = 'cfc121'
-          elseif (trim(mapt(n)) .eq. 'cocc') then
-            var1 = 'cocc1'
-          elseif (trim(mapt(n)) .eq. 'coccn15') then
-            var1 = 'coccn151'
+          elseif (trim(mapt(n)) .eq. 'diatn15') then
+            var1 = 'diatn151'
           elseif (trim(mapt(n)) .eq. 'caco3') then
             var1 = 'caco31'
-          elseif (trim(mapt(n)) .eq. 'coccc13') then
-            var1 = 'coccc131'
+          elseif (trim(mapt(n)) .eq. 'diatc13') then
+            var1 = 'diatc131'
           elseif (trim(mapt(n)) .eq. 'caco3c13') then
             var1 = 'caco3c131'
 # if defined O_kk_ballast
@@ -1448,14 +1437,12 @@
             var2 = 'cfc112'
           elseif (trim(mapt(n)) .eq. 'cfc12') then
             var2 = 'cfc122'
-          elseif (trim(mapt(n)) .eq. 'cocc') then
-            var2 = 'cocc2'
-          elseif (trim(mapt(n)) .eq. 'coccn15') then
-            var2 = 'coccn152'
+          elseif (trim(mapt(n)) .eq. 'diatn15') then
+            var2 = 'diatn152'
           elseif (trim(mapt(n)) .eq. 'caco3') then
             var2 = 'caco32'
-          elseif (trim(mapt(n)) .eq. 'coccc13') then
-            var2 = 'coccc132'
+          elseif (trim(mapt(n)) .eq. 'diatc13') then
+            var2 = 'diatc132'
           elseif (trim(mapt(n)) .eq. 'caco3c13') then
             var2 = 'caco3c132'
 # if defined O_kk_ballast

@@ -219,4 +219,32 @@ Mar 10: much too large vertical ALK gradient
 	moved output to out1
   introduce sildustfluxfac to scale or switch off atmospheric Si deposition
   set to zero in control.in and decrease capr from 0.55 to 0.25
+Mar 11: alk gradient too small now (mv to out2); increase capr to 0.35
+Mar 13: deep Indian alk too high, too much caco3 production in Indian Ocean
+  CaCO3 production is about equally from Zoop and Cocc  
+    o_coccgraz[k=@din,l=2,x=@din,y=@din]*0.3*1e-6 = 1.9
+    o_zoograz[k=@din,l=2,x=@din,y=@din]*0.3*1e-6 = 3.0
+    o_coccmort[k=@din,l=2,x=@din,y=@din]*1e-6 = 1.2
+    o_zoopmort[k=@din,l=2,x=@din,y=@din]*1e-6 = 1.0
+
+  if cocc calcite production was modelled as NPP-RECY:
+    cp_cocc[k=@din,l=2,x=@din,y=@din]*1e-6 = 7.5
+
+Mar 15, 2021: copied from ../coccnpp_omega
+  remove coccs
+  *.0: sfc sil too low 
+Mar 16: alk looks good
+ decrease sipr from 0.2 to 0.15
+
+TODO
+ diago.F capr
+ use Aumont et al. (2003) formulation for Si and Fe dependence of Si/C
+   this would require additional progn eq for Si in diat
+Mar 16, 2021: copied from ../nococcs
+  switch on n15
+
+Mar 16, 2021: copied from ../nococcs
+  switch on c13
+  fix dic13_in in call to mobi_driver in tracer.F
+  adjust calc_dc13.jnl with redctn=7
 

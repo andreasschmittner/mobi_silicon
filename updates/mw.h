@@ -97,13 +97,13 @@
 !       idin15 = index for din15
 !       idon15 = index for don15
 !       iphytn15 = index for phytoplankton n15
-!       icoccn15 = index for calcifier n15		       
+!       idiatn15 = index for diatom n15
 !       izoopn15 = index for zooplankton n15
 !       idetrn15 = index for detritus n15
 !       idiazn15 = index for diazotroph n15
 !       idoc13   = index for DOC13
 !       iphytc13 = index for phytoplankton carbon 13
-!       icoccc13 = index for calcifiers carbon 13
+!       idiatc13 = index for calcifiers carbon 13
 !       icaco3c13 = index for CaCO3 carbon 13
 !       izoopc13 = index for zooplankton carbon 13
 !       idetrc13 = index for detritus carbon 13
@@ -111,7 +111,6 @@
 !       mapt   = map for ocean tracer names
 !       idfe   = index for iron
 !       idetrfe= index for particulate iron
-!       icocc  = index for coccolithophores
 !       icaco3   = index for calcite
 !       idetr_B  = index for ballasted detritus
 !       isil   = index for silica
@@ -123,13 +122,13 @@
 
       integer itemp, isalt, idic, ic14, icfc11, icfc12, ialk, ipo4
       integer iphyt, izoop, idetr, io2, ino3, idiaz, idop, idon
-      integer idfe, idetrfe, icoccc13, icaco3c13
+      integer idfe, idetrfe, idiatc13, icaco3c13
       integer idin15, idon15, iphytn15, izoopn15, idetrn15, idiazn15
       integer idic13, idoc13, iphytc13, izoopc13, idetrc13, idiazc13
       common /mw_i/ itemp, isalt, idic, ic14, icfc11, icfc12, ialk
       common /mw_i/ ipo4, iphyt, izoop, idetr, io2, ino3, idiaz
       common /mw_i/ idop, idon, idin15, idon15, iphytn15, izoopn15
-      common /mw_i/ idetrn15, idiazn15, icoccc13, icaco3c13
+      common /mw_i/ idetrn15, idiazn15, idiatc13, icaco3c13
       common /mw_i/ idic13, idoc13, iphytc13, izoopc13, idetrc13
       common /mw_i/ idiazc13
       common /mw_i/ idfe, idetrfe
@@ -137,8 +136,8 @@
       integer idetr_B
       common /mw_i/ idetr_B
 
-      integer icocc, icoccn15
-      common /mw_i/ icocc, icoccn15
+      integer idiatn15
+      common /mw_i/ idiatn15
 
       integer icaco3
       common /mw_i/ icaco3
@@ -163,13 +162,13 @@
 !       isdin15 = index for din15
 !       isdon15 = index for don15
 !       isphytn15 = index for phytoplankton n15
-!       iscoccn15 = index for calcifiers n15		       
+!       isdiatn15 = index for calcifiers n15		       
 !       iszoopn15 = index for zooplankton n15
 !       isdetrn15 = index for detritus n15
 !       isdiazn15 = index for diazotroph n15
 !       isdoc13    = index for DOC13
 !       isphytc13  = index for carbon 13 in phytoplankton
-!       iscoccc13  = index for carbon 13 in calcifiers
+!       isdiatc13  = index for carbon 13 in calcifiers
 !       iscaco3c13  = index for carbon 13 in CaCO3
 !       iszoopc13  = index for carbon 13 in zooplankton
 !       isdetrc13  = index for carbon 13 in detritus
@@ -177,7 +176,6 @@
 !       isdfe   = index for iron
 !       isdetrfe= index for particulate iron
 !       isdetr_B  = index for ballasted detritus
-!       iscocc  = index for coccolithophores
 !       iscaco3   = index for calcite
 !       issil  = index for silica
 !       isdiat   = index for diatoms
@@ -194,21 +192,21 @@
       integer istemp, issalt, isdic, isc14, isalk, ispo4, isphyt
       integer iszoop, isdetr, iso2, isno3, isdiaz, isdop, isdon
       integer isdin15, isdon15, isphytn15, iszoopn15, isdetrn15
-      integer isdiazn15, isdfe, isdetrfe, iscoccc13, iscaco3c13
+      integer isdiazn15, isdfe, isdetrfe, isdiatc13, iscaco3c13
       integer isdic13, isdoc13, isphytc13, iszoopc13, isdetrc13
       integer isdiazc13
       common /mw_i/ istemp, issalt, isdic, isc14,isalk, ispo4, isphyt
       common /mw_i/ iszoop, isdetr, iso2, isno3, isdiaz, isdop, isdon
       common /mw_i/ isdin15, isdon15, isphytn15, iszoopn15, isdetrn15
-      common /mw_i/ isdiazn15, isdfe, isdetrfe, iscoccc13, iscaco3c13
+      common /mw_i/ isdiazn15, isdfe, isdetrfe, isdiatc13, iscaco3c13
       common /mw_i/ isdic13, isdoc13, isphytc13, iszoopc13, isdetrc13
       common /mw_i/ isdiazc13
 #if defined O_kk_ballast
       integer isdetr_B
       common /mw_i/ isdetr_B
 #endif
-      integer iscocc, iscoccn15
-      common /mw_i/ iscocc, iscoccn15
+      integer isdiatn15
+      common /mw_i/ isdiatn15
       integer iscaco3
       common /mw_i/ iscaco3
       integer issil, isdiat, isopl

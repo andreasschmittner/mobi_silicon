@@ -305,11 +305,9 @@
 !         skip since so surface flux
         elseif (trim(mapt(n)) .eq. 'detrfe') then
 !         skip since so surface flux
-        elseif (trim(mapt(n)) .eq. 'cocc') then
+        elseif (trim(mapt(n)) .eq. 'diatn15') then
 !         skip since no surface flux
-        elseif (trim(mapt(n)) .eq. 'coccn15') then
-!         skip since no surface flux
-        elseif (trim(mapt(n)) .eq. 'coccc13') then
+        elseif (trim(mapt(n)) .eq. 'diatc13') then
 !         skip since no surface flux
         elseif (trim(mapt(n)) .eq. 'caco3') then
 !         skip since no surface flux
@@ -494,15 +492,12 @@
         elseif (trim(mapt(n)) .eq. 'cfc12') then
           call defvar ('O_cfc12', iou, 4, it, -c1, c500, ' ', 'F'
      &,     'chlorofluorocarbon 12', ' ', 'mol m-3')
-        elseif (trim(mapt(n)) .eq. 'cocc') then
-          call defvar ('O_cocc', iou, 4, it, -c1, c100, ' ', 'F'
-     &,     'coccolithophores', ' ', 'mol N m-3')
-        elseif (trim(mapt(n)) .eq. 'coccn15') then
-          call defvar ('O_coccn15', iou, 4, it, -c1, c100, ' ', 'F'
-     &,     'coccolithophores n15', ' ', 'mol N15 m-3')
-        elseif (trim(mapt(n)) .eq. 'coccc13') then
-          call defvar ('O_coccc13', iou, 4, it, -c1, c100, ' ', 'F'
-     &,     'coccolithophores c13', ' ', 'mol C13 m-3')
+        elseif (trim(mapt(n)) .eq. 'diatn15') then
+          call defvar ('O_diatn15', iou, 4, it, -c1, c100, ' ', 'F'
+     &,     'diatom n15', ' ', 'mol N15 m-3')
+        elseif (trim(mapt(n)) .eq. 'diatc13') then
+          call defvar ('O_diatc13', iou, 4, it, -c1, c100, ' ', 'F'
+     &,     'diatom c13', ' ', 'mol C13 m-3')
         elseif (trim(mapt(n)) .eq. 'caco3') then
           call defvar ('O_caco3', iou, 4, it, -c1, c100, ' ', 'F'
      &,     'calcium carbonate (calcite)', ' ', 'mol C m-3')
@@ -580,11 +575,6 @@
       call defvar ('O_phytnpp_dop', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'phytoplankton NPP from DOP uptake', ' '
      &, 'mol N m-3 s-1')
-#   if defined O_mobi_caco3
-      call defvar ('O_calnpp_dop', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'calcifier NPP from DOP uptake', ' '
-     &, 'mol N m-3 s-1')
-#   endif
 #   if defined O_mobi_silicon
       call defvar ('O_diatnpp_dop', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'diatom NPP from DOP uptake', ' '
@@ -606,18 +596,8 @@
       call defvar ('O_excret', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'excretion rate', ' ', 'mol N m-3 s-1')
 #  if defined O_mobi_caco3
-      call defvar ('O_coccnpp', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'ocean cocc npp rate', ' ', 'mol N m-3 s-1')
-      call defvar ('O_coccgraz', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'cocc grazing rate', ' ', 'mol N m-3 s-1')
-      call defvar ('O_coccmort', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'cocc mortality rate', ' ', 'mol N m-3 s-1')
-      call defvar ('O_coccrecy', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'cocc microbial fast recycling rate', ' ', 'mol N m-3 s-1')
       call defvar ('O_caco3pro', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'calcite production',' ', 'mol C m-3 s-1')
-      call defvar ('O_caco3att', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'attached calcite',' ', 'mol C m-3 s-1')
 #  endif
 #  if defined O_kk_ballast
       call defvar ('O_detgraz_B', iou, 4, it, -c1, c100, ' ', 'F'
@@ -690,10 +670,6 @@
      &, 'mol Fe m-3 s-1')
       call defvar ('O_fecol', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'iron inorganic scavenging rate', ' ', 'mol Fe m-3 s-1')
-#    if defined O_mobi_caco3
-      call defvar ('O_deffe_C', iou, 4, it, -c1, c100, ' ', 'F'
-     &, 'iron deficiency coccs', ' ', '-')
-#    endif      
 #    if defined O_mobi_silicon
       call defvar ('O_deffe_Diat', iou, 4, it, -c1, c100, ' ', 'F'
      &, 'iron deficiency diatoms', ' ', '-')
@@ -767,16 +743,12 @@
      &,                        npp_D, npp_D_dop, graz_D, npp_dop, morp_D
      &,                        morpt_D
      &,                        nfix, wcdeni, bdeni
-#   if defined O_mobi_caco3
-     &,                        npp_C_dop
-#   endif      
 #   if defined O_mobi_silicon
      &,                        npp_Diat_dop
 #   endif      
 #  endif
 #  if defined O_mobi_caco3
-     &,                        npp_C, graz_C, morp_C, morpt_C
-     &,                        dissl, expocaco3, calatt, omega_c
+     &,                        dissl, expocaco3, omega_c
 #  endif
 #  if defined O_mobi_silicon
      &,                        npp_Diat, graz_Diat, morp_Diat
@@ -791,9 +763,6 @@
      &,                        feorgads
      &,                        deffe, feprime
      &,                        fesed, bfe, fecol
-#      if defined O_mobi_caco3
-     &,                        deffe_C
-#      endif
 #      if defined O_mobi_silicon
      &,                        deffe_Diat
 #      endif
@@ -903,10 +872,7 @@
       real graz_Det_B(ids:ide,jds:jde,kpzd)
 #  endif
 #  if defined O_mobi_caco3
-      real npp_C(ids:ide,jds:jde,kpzd), graz_C(ids:ide,jds:jde,kpzd)
-      real morp_C(ids:ide,jds:jde,kpzd), morpt_C(ids:ide,jds:jde,kpzd)
       real dissl(ids:ide,jds:jde,km), expocaco3(ids:ide,jds:jde,km)
-      real calatt(ids:ide,jds:jde,kpzd)
       real omega_c(ids:ide,jds:jde,kpzd)
       real procal(ids:ide,jds:jde,kpzd)
 #  else      
@@ -929,9 +895,6 @@ c      real buropl(ids:ide,jds:jde,km)
       real morpt_D(ids:ide,jds:jde,kpzd), nfix(ids:ide,jds:jde,kpzd)
       real wcdeni(ids:ide,jds:jde,km), bdeni(ids:ide,jds:jde,km)
       real morp_D(ids:ide,jds:jde,kpzd), graz_D(ids:ide,jds:jde,kpzd)
-#   if defined O_mobi_caco3
-      real npp_C_dop(ids:ide,jds:jde,kpzd)
-#   endif      
 #   if defined O_mobi_silicon
       real npp_Diat_dop(ids:ide,jds:jde,kpzd)
 #   endif      
@@ -943,9 +906,6 @@ c      real buropl(ids:ide,jds:jde,km)
       real deffe(ids:ide,jds:jde,kpzd), feprime(ids:ide,jds:jde,kpzd)
       real fesed(ids:ide,jds:jde,kpzd), bfe(ids:ide,jds:jde,kpzd)
       real fecol(ids:ide,jds:jde,kpzd)
-#     if defined O_mobi_caco3
-      real deffe_C(ids:ide,jds:jde,kpzd)
-#     endif      
 #     if defined O_mobi_silicon
       real deffe_Diat(ids:ide,jds:jde,kpzd)
 #     endif      
@@ -1285,11 +1245,9 @@ c      real buropl(ids:ide,jds:jde,km)
 !         skip since so surface flux
         elseif (trim(mapt(n)) .eq. 'detrfe') then
 !         skip since so surface flux  
-        elseif (trim(mapt(n)) .eq. 'cocc') then
+        elseif (trim(mapt(n)) .eq. 'diatn15') then
 !         skip since no surface flux
-        elseif (trim(mapt(n)) .eq. 'coccn15') then
-!         skip since no surface flux
-        elseif (trim(mapt(n)) .eq. 'coccc13') then
+        elseif (trim(mapt(n)) .eq. 'diatc13') then
 !         skip since no surface flux
         elseif (trim(mapt(n)) .eq. 'caco3') then
 !         skip since no surface flux
@@ -1462,18 +1420,15 @@ c      real buropl(ids:ide,jds:jde,km)
         elseif (trim(mapt(n)) .eq. 'phytc13') then
           call putvaramsk('O_phytc13', iou, ln, ib, ic, tmpijk, tmpijkm
      &,     c1, c0)  
-        elseif (trim(mapt(n)) .eq. 'cocc') then
-          call putvaramsk('O_cocc', iou, ln, ib, ic, tmpijk, tmpijkm
-     &,     c1e3, c0)
 # if defined O_save_carbon_totals
           toc(ils:ile,jls:jle,kls:kle) = toc(ils:ile,jls:jle,kls:kle)
      &      + tmpijk(ils:ile,jls:jle,kls:kle)*redctn
 # endif
-        elseif (trim(mapt(n)) .eq. 'coccn15') then
-          call putvaramsk('O_coccn15', iou, ln, ib, ic, tmpijk, tmpijkm
+        elseif (trim(mapt(n)) .eq. 'diatn15') then
+          call putvaramsk('O_diatn15', iou, ln, ib, ic, tmpijk, tmpijkm
      &,     c1e3, c0)
-        elseif (trim(mapt(n)) .eq. 'coccc13') then
-          call putvaramsk('O_coccc13', iou, ln, ib, ic, tmpijk, tmpijkm
+        elseif (trim(mapt(n)) .eq. 'diatc13') then
+          call putvaramsk('O_diatc13', iou, ln, ib, ic, tmpijk, tmpijkm
      &,     c1, c0)
         elseif (trim(mapt(n)) .eq. 'caco3') then
           call putvaramsk('O_caco3', iou, ln, ib, ic, tmpijk, tmpijkm
@@ -1639,23 +1594,8 @@ c      real buropl(ids:ide,jds:jde,km)
       call putvaramsk ('O_phytnpp', iou, ln, ib, ic, tmpijl, tmpijlm
      &, c1e3, c0)
 #  if defined O_mobi_caco3
-      tmpijl(ils:ile,jls:jle,lls:lle) = npp_C(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_coccnpp', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
-      tmpijl(ils:ile,jls:jle,lls:lle) = graz_C(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_coccgraz', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
-      tmpijl(ils:ile,jls:jle,lls:lle) = morp_C(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_coccmort', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
-      tmpijl(ils:ile,jls:jle,lls:lle) = morpt_C(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_coccrecy', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
       tmpijl(ils:ile,jls:jle,lls:lle) = procal(ils:ile,jls:jle,lls:lle)
       call putvaramsk ('O_caco3pro', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
-      tmpijl(ils:ile,jls:jle,lls:lle) = calatt(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_caco3att', iou, ln, ib, ic, tmpijl, tmpijlm
      &, c1e3, c0)
 #  endif
 #  if defined O_kk_ballast
@@ -1685,12 +1625,6 @@ c      real buropl(ids:ide,jds:jde,km)
       tmpijl(ils:ile,jls:jle,lls:lle) = npp_dop(ils:ile,jls:jle,lls:lle)
       call putvaramsk ('O_phytnpp_dop', iou, ln, ib, ic, tmpijl, tmpijlm
      &, c1e3, c0)
-#   if defined O_mobi_caco3
-      tmpijl(ils:ile,jls:jle,lls:lle) =
-     &                       npp_C_dop(ils:ile,jls:jle,lls:lle)
-      call putvaramsk ('O_calnpp_dop', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1e3, c0)
-#   endif      
 #   if defined O_mobi_silicon
       tmpijl(ils:ile,jls:jle,lls:lle) =
      &                       npp_Diat_dop(ils:ile,jls:jle,lls:lle)
@@ -1836,12 +1770,6 @@ c      real buropl(ids:ide,jds:jde,km)
      &, lls:lle)
       call putvaramsk ('O_fecol', iou, ln, ib, ic, tmpijl, tmpijlm
      &, c1e3, c0)
-#    if defined O_mobi_caco3
-      tmpijl(ils:ile,jls:jle,lls:lle) = deffe_C(ils:ile,jls:jle
-     &, lls:lle)
-      call putvaramsk ('O_deffe_C', iou, ln, ib, ic, tmpijl, tmpijlm
-     &, c1, c0)
-#    endif      
 #    if defined O_mobi_silicon
       tmpijl(ils:ile,jls:jle,lls:lle) = deffe_Diat(ils:ile,jls:jle
      &, lls:lle)

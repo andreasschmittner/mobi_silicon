@@ -378,13 +378,12 @@ C      The units really need to be checked!
             tnpzd(:,imobizoopn15) = t(i,:,j,izoopn15,taum1)
             tnpzd(:,imobidetrn15) = t(i,:,j,idetrn15,taum1)
             tnpzd(:,imobidiazn15) = t(i,:,j,idiazn15,taum1)
-#    if defined O_mobi_caco3
-            tnpzd(:,imobicoccn15) = t(i,:,j,icoccn15,taum1)
-#    endif            
+#    if defined O_mobi_silicon
+            tnpzd(:,imobidiatn15) = t(i,:,j,idiatn15,taum1)
+#    endif
 #   endif
 #  endif
 #  if defined O_mobi_caco3
-            tnpzd(:,imobicocc) = t(i,:,j,icocc,taum1)
             tnpzd(:,imobicaco3) = t(i,:,j,icaco3,taum1)
 #  endif
 #  if defined O_kk_ballast
@@ -406,8 +405,10 @@ C      The units really need to be checked!
             tnpzd(:,imobizoopc13) = t(i,:,j,izoopc13,taum1)
             tnpzd(:,imobidetrc13) = t(i,:,j,idetrc13,taum1)
             tnpzd(:,imobidiazc13) = t(i,:,j,idiazc13,taum1)
+#   if defined O_mobi_silicon
+            tnpzd(:,imobidiatc13) = t(i,:,j,idiatc13,taum1)
+#   endif            
 #   if defined O_mobi_caco3
-            tnpzd(:,imobicoccc13) = t(i,:,j,icoccc13,taum1) 
             tnpzd(:,imobicaco3c13) = t(i,:,j,icaco3c13,taum1) 
 #   endif            
 #  endif
@@ -453,7 +454,7 @@ cAAA is this necessary (already in tnpzd)?
      &,                s_in, dic_in, alk_in, co2_in
 #  endif
 #  if defined O_carbon_13
-     &,                dic13_in
+c     &,                dic13_in
 #  endif
 #  if defined O_mobi_silicon
 c     &,                sil_in

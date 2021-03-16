@@ -450,17 +450,18 @@ c            sbc(i,j,idic13flx) = sbc(i,j,idic13flx) + disch(i,j)*tmp
             sbc(i,j,idetrflx_B) = sbc(i,j,idetrflx_B)+gaost(idetr_B)*tmp
 #     endif
 #     if defined O_mobi_caco3
-            sbc(i,j,icoccflx) = sbc(i,j,icoccflx) + gaost(icocc)*tmp
             sbc(i,j,icaco3flx) = sbc(i,j,icaco3flx) + gaost(icaco3)*tmp
 #      if defined O_carbon_13
-            sbc(i,j,icoccc13flx) = sbc(i,j,icoccc13flx) 
-     &                           + gaost(icoccc13)*tmp
             sbc(i,j,icaco3c13flx) = sbc(i,j,icaco3c13flx) 
      &                            + gaost(icaco3c13)*tmp
 #      endif
 #     endif
 #     if defined O_mobi_silicon
             sbc(i,j,idiatflx) = sbc(i,j,idiatflx) + gaost(idiat)*tmp
+#      if defined O_carbon_13
+            sbc(i,j,idiatc13flx) = sbc(i,j,idiatc13flx) 
+     &                           + gaost(idiatc13)*tmp
+#      endif
 #     endif
 #    endif
 #    if defined O_mobi_nitrogen
@@ -480,9 +481,9 @@ c            sbc(i,j,idic13flx) = sbc(i,j,idic13flx) + disch(i,j)*tmp
 #      if !defined O_mobi_no_vflux 
             sbc(i,j,iphytn15flx) = sbc(i,j,iphytn15flx) 
      &           + gaost(iphytn15)*tmp
-#       if defined O_mobi_caco3
-            sbc(i,j,icoccn15flx) = sbc(i,j,icoccn15flx) 
-     &                          + gaost(icoccn15)*tmp
+#       if defined O_mobi_silicon
+            sbc(i,j,idiatn15flx) = sbc(i,j,idiatn15flx) 
+     &                          + gaost(idiatn15)*tmp
 #       endif            
             sbc(i,j,izoopn15flx) = sbc(i,j,izoopn15flx) 
      &                          + gaost(izoopn15)*tmp
@@ -540,7 +541,6 @@ c            sbc(i,j,idic13flx) = sbc(i,j,idic13flx) + disch(i,j)*tmp
       call setbcx (sbc(1,1,idetrflx_B), imt, jmt)
 #     endif
 #     if defined O_mobi_caco3
-      call setbcx (sbc(1,1,icoccflx), imt, jmt)
       call setbcx (sbc(1,1,icaco3flx), imt, jmt)
 #     endif
 #     if defined O_mobi_silicon
@@ -566,8 +566,8 @@ c            sbc(i,j,idic13flx) = sbc(i,j,idic13flx) + disch(i,j)*tmp
       call setbcx (sbc(1,1,idon15flx), imt, jmt)
 #      if !defined O_mobi_no_vflux
       call setbcx (sbc(1,1,iphytn15flx), imt, jmt)
-#       if defined O_mobi_caco3
-      call setbcx (sbc(1,1,icoccn15flx), imt, jmt)
+#       if defined O_mobi_silicon
+      call setbcx (sbc(1,1,idiatn15flx), imt, jmt)
 #       endif      
       call setbcx (sbc(1,1,izoopn15flx), imt, jmt)
       call setbcx (sbc(1,1,idetrn15flx), imt, jmt)
@@ -579,8 +579,10 @@ c            sbc(i,j,idic13flx) = sbc(i,j,idic13flx) + disch(i,j)*tmp
       call setbcx (sbc(1,1,idoc13flx), imt, jmt)
 #     if !defined O_mobi_no_vflux
       call setbcx (sbc(1,1,iphytc13flx), imt, jmt)
+#      if defined O_mobi_silicon
+      call setbcx (sbc(1,1,idiatc13flx), imt, jmt)
+#      endif
 #      if defined O_mobi_caco3
-      call setbcx (sbc(1,1,icoccc13flx), imt, jmt)
       call setbcx (sbc(1,1,icaco3c13flx), imt, jmt)
 #      endif
       call setbcx (sbc(1,1,izoopc13flx), imt, jmt)

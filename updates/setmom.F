@@ -1317,8 +1317,6 @@ C       endif
                 t(i,k,j,n,taup1) = 0.0
               elseif (trim(mapt(n)) .eq. 'cfc12') then
                 t(i,k,j,n,taup1) = 0.0
-              elseif (trim(mapt(n)) .eq. 'cocc') then
-                t(i,k,j,n,taup1) = 0.14*exp((zt(1)-zt(k))/100.e2)
               elseif (trim(mapt(n)) .eq. 'caco3') then
                 t(i,k,j,n,taup1) = 5.e-5 ! mol/m^3 average Lam et al. (2010, GBC)
 # if defined O_kk_ballast
@@ -1536,8 +1534,8 @@ C       endif
      &           / (1 + rn15std)
              t(i,k,j,iphytn15,taup1) = rn15std*t(i,k,j,iphyt,taup1)
      &           / (1 + rn15std)
-#  if defined O_mobi_caco3
-            t(i,k,j,icoccn15,taup1) = rn15std*t(i,k,j,icocc,taup1)
+#  if defined O_mobi_silicon
+            t(i,k,j,idiatn15,taup1) = rn15std*t(i,k,j,idiat,taup1)
      &           / (1 + rn15std)
 #  endif             
              t(i,k,j,izoopn15,taup1) = rn15std*t(i,k,j,izoop,taup1)
@@ -1558,9 +1556,11 @@ C       endif
 #  if defined O_mobi
              t(i,k,j,iphytc13,taup1) = t(i,k,j,iphyt,taup1)*6.625e-3
      &            *rc13std/(1. + rc13std)
-#   if defined O_mobi_caco3
-             t(i,k,j,icoccc13,taup1) = t(i,k,j,icocc,taup1)*6.625e-3
+#   if defined O_mobi_silicon
+             t(i,k,j,idiatc13,taup1) = t(i,k,j,idiat,taup1)*6.625e-3
      &            *rc13std/(1. + rc13std)
+#   endif             
+#   if defined O_mobi_caco3
              t(i,k,j,icaco3c13,taup1) = t(i,k,j,icaco3,taup1)
      &            *rc13std/(1. + rc13std)
 #   endif             
@@ -1856,11 +1856,6 @@ C       endif
      &,   gaost(iphyt)*0.001
       endif
 #  if defined O_mobi_caco3
-      if (icocc .ne. 0 .and. isscocc .ne. 0) then
-        call areaavg (sbc(1,1,isscocc), dmsk, gaost(icocc))
-        print*, "global average sea surface coccs (mol m-3) = "
-     &,   gaost(icocc)*0.001
-      endif
       if (icaco3 .ne. 0 .and. isscaco3 .ne. 0) then
         call areaavg (sbc(1,1,isscaco3), dmsk, gaost(icaco3))
         print*, "global average sea surface calcite (mol C m-3) = "
@@ -1925,11 +1920,11 @@ C       endif
         print*, "global average sea surface phytoplankton n15 " 
      &,         "(mol m-3) = ", gaost(iphytn15)*0.001
       endif
-#  if defined O_mobi_caco3
-      if (icoccn15 .ne. 0 .and. isscoccn15 .ne. 0) then
-        call areaavg (sbc(1,1,isscoccn15), dmsk, gaost(icoccn15))
-        print*, "global average sea surface calcifiers n15 " 
-     &,         "(mol m-3) = ", gaost(icoccn15)*0.001
+#  if defined O_mobi_silicon
+      if (idiatn15 .ne. 0 .and. issdiatn15 .ne. 0) then
+        call areaavg (sbc(1,1,issdiatn15), dmsk, gaost(idiatn15))
+        print*, "global average sea surface diazotroph n15 " 
+     &,         "(mol m-3) = ", gaost(idiatn15)*0.001
       endif
 #  endif      
       if (izoopn15 .ne. 0 .and. isszoopn15 .ne. 0) then
@@ -1959,12 +1954,14 @@ C       endif
         print*, "global average sea surface phytoplankton C13"
      &,         " (mol m-3) = ", gaost(iphytc13)*0.001
       endif
-#  if defined O_mobi_caco3
-      if (icoccc13 .ne. 0 .and. isscoccc13 .ne. 0) then
-        call areaavg (sbc(1,1,isscoccc13), dmsk, gaost(icoccc13))
-        print*, "global average sea surface calcifiers C13"
-     &,         " (mol m-3) = ", gaost(icoccc13)*0.001
+#  if defined O_mobi_silicon
+      if (idiatc13 .ne. 0 .and. issdiatc13 .ne. 0) then
+        call areaavg (sbc(1,1,issdiatc13), dmsk, gaost(idiatc13))
+        print*, "global average sea surface diatom C13"
+     &,         " (mol m-3) = ", gaost(idiatc13)*0.001
       endif
+#  endif      
+#  if defined O_mobi_caco3
       if (icaco3c13 .ne. 0 .and. isscaco3c13 .ne. 0) then
         call areaavg (sbc(1,1,isscaco3c13), dmsk, gaost(icaco3c13))
         print*, "global average sea surface CaCO3 C13"

@@ -25,7 +25,9 @@
 !   wd       = sinking speed of detritus [m day-1]
 !   ztt      = depth to top of grid cell [cm]
 !   dtnpzd   = time step of biology
+!   caprmax  = maximum carbonate to carbon production ratio
 !   capr     = carbonate to carbon production ratio
+!   kcapr    = half saturation for capr
 !   dcaco3   = remineralisation depth of calcite [cm]
 !   rcak     = array used in calculating calcite remineralization
 !   rcab     = array used in calculating bottom calcite remineralization
@@ -104,7 +106,10 @@
      &                  + 2 ! doc13, diazc13
 #  endif		 
 #  if defined O_mobi_caco3
-     &                  + 2 ! coccc13, caco3c13
+     &                  + 1 ! caco3c13
+#  endif		 
+#  if defined O_mobi_silicon
+     &                  + 1 ! diatc13
 #  endif		 
 # endif
 #endif		 
@@ -112,13 +117,13 @@
      &                  + 4 ! no3, diaz, don, dop
 # if defined O_mobi_nitrogen_15
      &                  + 6 ! din15, don15, phytn15, zoopn15, detrn15, diazn15
-#  if defined O_mobi_caco3
-     &                  + 1 ! coccn15
+#  if defined O_mobi_silicon
+     &                  + 1 ! diatn15
 #  endif		 
 # endif
 #endif
 #if defined O_mobi_caco3
-     &                   +2 ! cocc, caco3
+     &                   +1 ! caco3
 #endif
 #if defined O_kk_ballast
      &                   +1 ! detr_B
@@ -142,9 +147,11 @@
       integer imobizoopc13, imobidetrc13, imobidiazc13
       common /npzd_i/ imobidic13, imobidoc13, imobiphytc13
       common /npzd_i/ imobizoopc13, imobidetrc13, imobidiazc13
+#  if defined O_mobi_silicon
+      integer imobidiatc13
+      common /npzd_i/ imobidiatc13
+#  endif
 #  if defined O_mobi_caco3
-      integer imobicoccc13
-      common /npzd_i/ imobicoccc13
       integer imobicaco3c13
       common /npzd_i/ imobicaco3c13
 #  endif
@@ -158,15 +165,13 @@
       integer imobizoopn15, imobidetrn15, imobidiazn15
       common /npzd_i/ imobidin15, imobidon15, imobiphytn15
       common /npzd_i/ imobizoopn15, imobidetrn15, imobidiazn15
-#  if defined O_mobi_caco3
-      integer imobicoccn15
-      common /npzd_i/ imobicoccn15
+#  if defined O_mobi_silicon
+      integer imobidiatn15
+      common /npzd_i/ imobidiatn15
 #  endif
 # endif
 #endif
 #if defined O_mobi_caco3
-      integer imobicocc
-      common /npzd_i/ imobicocc
       integer imobicaco3
       common /npzd_i/ imobicaco3
 #endif
@@ -205,8 +210,8 @@
       common /npzd_r/ tap, kw, kc, ki, abio_P, bbio, cbio, k1n, nup
       real            gamma1, gbio, epsbio, nuz, nud0, LFe, dfr
       common /npzd_r/ gamma1, gbio, epsbio, nuz, nud0, LFe, dfr
-      real            wd,     ztt,     dtnpzd, capr
-      common /npzd_r/ wd(km), ztt(km), dtnpzd, capr
+      real            wd,     ztt,     dtnpzd, capr, caprmax, kcapr
+      common /npzd_r/ wd(km), ztt(km), dtnpzd, capr, caprmax, kcapr
       real            dcaco3, rcak,     rcab,     nupt0, wd0, k1p_P
       common /npzd_r/ dcaco3, rcak(km), rcab(km), nupt0, wd0, k1p_P
       real            redptc, redctn, redctp, redptn, redntp, redotn

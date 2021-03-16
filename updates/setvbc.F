@@ -103,7 +103,6 @@
           stf(i,j,idetr_B) = sbc(i,jrow,idetrflx_B)*tmask(i,1,j)
 #   endif
 #   if defined O_mobi_caco3
-          stf(i,j,icocc) = sbc(i,jrow,icoccflx)*tmask(i,1,j)
           stf(i,j,icaco3) = sbc(i,jrow,icaco3flx)*tmask(i,1,j)
 #   endif
 #   if defined O_mobi_silicon
@@ -122,8 +121,8 @@
           stf(i,j,idon15) = sbc(i,jrow,idon15flx)*tmask(i,1,j)
 #    if !defined O_mobi_no_vflux
           stf(i,j,iphytn15) = sbc(i,jrow,iphytn15flx)*tmask(i,1,j)
-#     if defined O_mobi_caco3
-          stf(i,j,icoccn15) = sbc(i,jrow,icoccn15flx)*tmask(i,1,j)
+#     if defined O_mobi_silicon
+          stf(i,j,idiatn15) = sbc(i,jrow,idiatn15flx)*tmask(i,1,j)
 #     endif          
           stf(i,j,izoopn15) = sbc(i,jrow,izoopn15flx)*tmask(i,1,j)
           stf(i,j,idetrn15) = sbc(i,jrow,idetrn15flx)*tmask(i,1,j)
@@ -141,8 +140,10 @@
           stf(i,j,idoc13) = sbc(i,jrow,idoc13flx)*tmask(i,1,j)
 #   if !defined O_mobi_no_vflux
           stf(i,j,iphytc13) = sbc(i,jrow,iphytc13flx)*tmask(i,1,j)
+#    if defined O_mobi_silicon
+         stf(i,j,idiatc13) = sbc(i,jrow,idiatc13flx)*tmask(i,1,j)
+#    endif          
 #    if defined O_mobi_caco3
-         stf(i,j,icoccc13) = sbc(i,jrow,icoccc13flx)*tmask(i,1,j)
          stf(i,j,icaco3c13) = sbc(i,jrow,icaco3c13flx)*tmask(i,1,j)
 #    endif          
           stf(i,j,izoopc13) = sbc(i,jrow,izoopc13flx)*tmask(i,1,j)

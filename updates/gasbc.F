@@ -147,8 +147,6 @@ CSPKKK sit_in introduced by kk
      &  call areaavg (sbc(1,1,issdetr_B), dmsk, gaost(idetr_B))
 #    endif
 #    if defined O_mobi_caco3
-      if (isscocc .ne. 0)
-     &  call areaavg (sbc(1,1,isscocc), dmsk, gaost(icocc))
       if (isscaco3 .ne. 0)
      &  call areaavg (sbc(1,1,isscaco3), dmsk, gaost(icaco3))
 #    endif
@@ -168,9 +166,9 @@ CSPKKK sit_in introduced by kk
 #   if !defined O_mobi_no_vflux
       if (issphytn15 .ne. 0)
      &  call areaavg (sbc(1,1,issphytn15), dmsk, gaost(iphytn15))
-#    if defined O_mobi_caco3
-      if (isscoccn15 .ne. 0)
-     &  call areaavg (sbc(1,1,isscoccn15), dmsk, gaost(icoccn15))
+#    if defined O_mobi_silicon
+      if (issdiatn15 .ne. 0)
+     &  call areaavg (sbc(1,1,issdiatn15), dmsk, gaost(idiatn15))
 #    endif      
       if (isszoopn15 .ne. 0)
      &  call areaavg (sbc(1,1,isszoopn15), dmsk, gaost(izoopn15))
@@ -184,9 +182,11 @@ CSPKKK sit_in introduced by kk
 #   if !defined O_mobi_no_vflux
       if (issphytc13 .ne. 0)
      &  call areaavg (sbc(1,1,issphytc13), dmsk, gaost(iphytc13))
+#    if defined O_mobi_silicon
+      if (issdiatc13 .ne. 0)
+     &  call areaavg (sbc(1,1,issdiatc13), dmsk, gaost(idiatc13))
+#    endif      
 #    if defined O_mobi_caco3
-      if (isscoccc13 .ne. 0)
-     &  call areaavg (sbc(1,1,isscoccc13), dmsk, gaost(icoccc13))
       if (isscaco3c13 .ne. 0)
      &  call areaavg (sbc(1,1,isscaco3c13), dmsk, gaost(icaco3c13))
 #    endif      
@@ -262,7 +262,6 @@ CSPKKK sit_in introduced by kk
       sbc(:,:,idetrflx_B) = 0.
 #   endif
 #   if defined O_mobi_caco3
-      sbc(:,:,icoccflx) = 0.
       sbc(:,:,icaco3flx) = 0.
 #   endif
 #   if defined O_mobi_silicon
@@ -288,8 +287,8 @@ CSPKKK sit_in introduced by kk
       sbc(:,:,idon15flx) = 0.
 #    if !defined O_mobi_no_vflux
       sbc(:,:,iphytn15flx) = 0.
-#     if defined O_mobi_caco3
-      sbc(:,:,icoccn15flx) = 0.
+#     if defined O_mobi_silicon
+      sbc(:,:,idiatn15flx) = 0.
 #     endif      
       sbc(:,:,izoopn15flx) = 0.
       sbc(:,:,idetrn15flx) = 0.
@@ -300,8 +299,10 @@ CSPKKK sit_in introduced by kk
 #  if defined O_carbon_13
 #   if !defined O_mobi_no_vflux
       sbc(:,:,iphytc13flx) = 0.
+#    if defined O_mobi_silicon
+      sbc(:,:,idiatc13flx) = 0
+#    endif
 #    if defined O_mobi_caco3
-      sbc(:,:,icoccc13flx) = 0
       sbc(:,:,icaco3c13flx) = 0
 #    endif
       sbc(:,:,izoopc13flx) = 0.

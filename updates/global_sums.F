@@ -214,13 +214,9 @@
             toc(3) = toc(3) + t(i,k,j,icaco3,taup1)*vol*1.e-3
 ! attached calcite
             toc(3) = toc(3) + t(i,k,j,izoop,taup1)*vol*redctn*capr
-            toc(3) = toc(3) + t(i,k,j,icocc,taup1)*vol*redctn*capr
 #     if defined O_kk_ballast
             toc(3) = toc(3) + t(i,k,j,idetr_B,taup1)*vol*redctn
 #     endif
-#    endif
-#    if defined O_mobi_caco3
-            toc(3) = toc(3) + t(i,k,j,icocc,taup1)*vol*redctn
 #    endif
 #    if defined O_mobi_silicon
             toc(3) = toc(3) + t(i,k,j,idiat,taup1)*vol*redctn

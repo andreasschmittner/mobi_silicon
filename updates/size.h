@@ -53,7 +53,7 @@
 #if defined O_mobi
      $             +4 ! po4, phyt, zoop, detr
 # if defined O_mobi_caco3
-     $             +2 ! cocc, caco3
+     $             +1 ! caco3
 #  if defined O_kk_ballast
      $             +1 !
 #  endif
@@ -65,15 +65,18 @@
      $             +4 ! no3, diaz, dop, don
 #  if defined O_mobi_nitrogen_15
      $             +6 ! din15, phytn15, zoopn15, detrn15, diazn15, don15
-#   if defined O_mobi_caco3
-     $             +1 ! coccn15
+#   if defined O_mobi_silicon
+     $             +1 ! diatn15
 #   endif		 
 #  endif
 # endif
 # if defined O_carbon_13
      $             +3 ! phytc13, zoopc13, detrc13
 #  if defined O_mobi_caco3
-     $             +2 ! coccc13, caco3c13
+     $             +1 ! caco3c13
+#  endif
+#  if defined O_mobi_silicon
+     $             +1 ! diatc13
 #  endif		 
 #  if defined O_mobi_nitrogen
      $             +2 ! diazc13, doc13
@@ -106,7 +109,7 @@
      $               +1 
 # endif
 # if defined O_mobi_caco3
-     $               +2 ! cocc, caco3
+     $               +1 ! caco3
 # endif
 # if defined O_mobi_silicon
      $               +3 ! diat, sil, opl
@@ -115,15 +118,18 @@
      $               +4 ! no3, diaz, dop, don
 #  if defined O_mobi_nitrogen_15
      $               +6 ! din15, phytn15, zoopn15, detrn15, diazn15, don15
-#   if defined O_mobi_caco3
-     $               +1 ! coccn15
-#   endif		 
+#   if defined O_mobi_silicon
+     $               +1 ! diatn15
+#   endif
 #  endif
 # endif
 # if defined O_carbon_13
      $               +3 ! phytc13, zoopc13, detrc13
 #  if defined O_mobi_caco3
-     $               +2 ! coccc13, caco3c13
+     $               +1 ! caco3c13
+#  endif
+#  if defined O_mobi_silicon
+     $               +1 ! diatc13
 #  endif
 #  if defined O_mobi_nitrogen
      $               +2 ! diazc13, doc13

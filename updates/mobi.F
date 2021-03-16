@@ -27,20 +27,17 @@
 # endif
       namelist /mobi/   alpha, kw, kc, abio_P, bbio, cbio, k1n, nup
      &,                 gamma1, gbio, epsbio, nuz, nud0, dbct_D
-     &,                 wd0, par, dtnpzd, redctn, ki, redptn, capr
-     &,                 dcaco3, nupt0, redotn, jdiar, kzoo, geZ
+     &,                 wd0, par, dtnpzd, redctn, ki, redptn, caprmax
+     &,                 kcapr, dcaco3, nupt0, redotn, jdiar, kzoo, geZ
      &,                 zprefP, zprefZ, zprefDet, zprefDiaz, kfe, kfe_D
+     &,                 knmax, knmin
 # if defined O_mobi_iron
      &,                 kfeleq, kfecol, alphamax, alphamin
      &,                 thetamaxhi, rfeton, fetopsed, o2min
      &,                 lig, thetamaxlo, mc, kfeorg
      &,                 kfemax, kfemin, pmax
-     &,                 knmax, knmin, knmax_Diat, knmin_Diat
-#  if defined O_mobi_caco3
-     &,                 kfemin_C, kfemax_C
-     &,                 knmin_C, knmax_C
-#  endif
 #  if defined O_mobi_silicon
+     &,                 knmax_Diat, knmin_Diat
      &,                 kfemin_Diat, kfemax_Diat
 #  endif
 # endif
@@ -54,7 +51,7 @@
      &,                 bapr
 # endif
 # if defined O_mobi_silicon
-     &,                 abiodiat, k1n_Diat, nudt0,nu_diat, alpha_Diat
+     &,                 abiodiat, k1n_Diat, nudt0, nu_diat, alpha_Diat
      &,                 zprefDiat, k1si, sildustfluxfac
 # endif
 # if defined O_mobi_silicon
@@ -90,7 +87,8 @@
       dtnpzd = dtts/4.  ! time step of biology [s]
       redctn = 7.1  ! C/N Redfield ratio (Schneider et al., 2003, GBC)
       redptn = 1./16.  ! P/N Redfield ratio
-      capr = 0.022  ! carbonate to carbon production ratio
+      caprmax = 0.022  ! carbonate to carbon production ratio
+      kcapr = 0.4 ! half saturation for PIC/POC ratio (Gehlen et al. 2007, BGS)
       dcaco3 = 650000.0  ! remineralisation depth of calcite [cm]
       redotn = 10.6  ! O2/N Redfield ratio (Anderson & Sarmiento, 1994, GBC)
       jdiar = 0.08  ! factor reducing the growth rate of diazotrophs
@@ -102,11 +100,6 @@
       dfr = 0.08   ! phyt mortality refractory/semi-labile DOM fraction
       dfrt = 0.01  ! phyt fast-recy refracotyr/semi-labile DOM fraction
       hdop = 0.4   ! DOP growth rate handicap
-      alpha_C = 0.06  ! Initial slope P-I curve [(W/m^2)^(-1)/day]
-      abio_C = 0.52  ! a; Maximum growth rate parameter coccolithophore [1/day]
-      k1n_C = 0.4  ! Half sat const for N uptake (coccolithophores) [mmol/m^3]
-      nuc = 0.03  ! Specific mortality rate (coccolithophores) [1/day]
-      nuct0 = 0.015  ! Specific mortality rate (coccolithophores) [1/day]
 # if defined O_mobi_silicon
       alpha_Diat = 0.1  ! Initial slope P-I curve [(W/m^2)^(-1)/day]
       abiodiat = 3.45  ! a; Maximum growth rate parameter diatoms [1/day]
@@ -136,16 +129,12 @@ c     z` = 6 km = wo0/si_dis0
       dissk0 = 0.013 !initial dissolution rate parameter [1/day] 
 
       zprefP = 0.18 ! Zooplankton preference for P
-      zprefC = 0.18 ! Zooplankton preference for C
       zprefDiat = 0.18 ! Zooplankton preference for Diatoms
       zprefDiaz = 0.1 ! Zooplankton preference for diazotrophs
       zprefZ = 0.18 ! Zooplankton preference for other Z
       zprefDet = 0.18 ! Zooplankton preference for Detritus
 # if !defined O_mobi_nitrogen
       zprefDiaz = 0.
-# endif
-# if !defined O_mobi_caco3
-      zprefC = 0.
 # endif
 # if !defined O_mobi_silicon
       zprefDiat = 0.
@@ -185,13 +174,6 @@ c     z` = 6 km = wo0/si_dis0
       pmax = 0.15 ! Phyt biomass above which kfe increases [mmol N / m-3]
       kfe_D = 0.1e-3 ! Half sat. const. for Diaz Fe limit. [mmol Fe / m-3]
 c     juan: Levin's value was 0.1e-3
-#  if defined O_mobi_caco3
-      kfemin_C = 0.04e-3
-      kfemax_C = 0.4e-3
-      knmin_C = 0.15
-      knmax_C = 1.5
-      pmax_C = 0.15
-#  endif
 #  if defined O_mobi_silicon
       kfemin_Diat = 0.04e-3
       kfemax_Diat = 0.8e-3
@@ -238,11 +220,6 @@ c     juan: Levin's value was 0.1e-3
       print*,'O_carbon must be defined if O_mobi_caco3 is used'
       stop
 #  endif      
-      k1p_C  = k1n_C*redptn
-      alpha_C = alpha_C/daylen
-      abio_C = abio_C/daylen
-      nuc = nuc/daylen
-      nuct0 = nuct0/daylen
       wc0 = wc0*1.e2
       kc_c = kc_c*1.e-2
       dissk0 = dissk0/daylen
@@ -431,8 +408,10 @@ c     juan: Levin's value was 0.1e-3
       call setimobi('imobidoc13',imobidoc13,imobi)
       call setimobi('imobidiazc13',imobidiazc13,imobi)
 #   endif
+#   if defined O_mobi_silicon
+      call setimobi('imobidiatc13',imobidiatc13,imobi)
+#   endif
 #   if defined O_mobi_caco3
-      call setimobi('imobicoccc13',imobicoccc13,imobi)
       call setimobi('imobicaco3c13',imobicaco3c13,imobi)
 #   endif
 #  endif
@@ -449,13 +428,12 @@ c     juan: Levin's value was 0.1e-3
       call setimobi('imobizoopn15',imobizoopn15,imobi)
       call setimobi('imobidetrn15',imobidetrn15,imobi)
       call setimobi('imobidiazn15',imobidiazn15,imobi)
-#   if defined O_mobi_caco3
-      call setimobi('imobicoccn15',imobicoccn15,imobi)
+#   if defined O_mobi_silicon
+      call setimobi('imobidiatn15',imobidiatn15,imobi)
 #   endif
 #  endif
 # endif
 # if defined O_mobi_caco3
-      call setimobi('imobicocc',imobicocc,imobi)
       call setimobi('imobicaco3',imobicaco3,imobi)
 # endif
 # if defined O_kk_ballast
@@ -561,8 +539,6 @@ c     &,                din15_in
 # endif
       real calpro
 # if defined O_mobi_caco3
-      real biococc,jmax_C,u_C,gd_C,npp_C, morp_C,morpt_C
-      real nuct, g_C, graz_C, ing_C, felimit_C, gl_C, npp_C_dop
       real dissl, caco3in, atmpres1, pHlo1, pHhi1, pH1, p_in
       real co2star1, dco2star1, pCO21, dpco21, CO31, omegaca, omegaar
       real c_in, wwc, expocaco3, impocaco3, dissk1, calatt
@@ -681,9 +657,6 @@ c     &,                din15_in
       rmorp_D(:) = 0.0
       rmorpt_D(:) = 0.0
       rnfix(:) = 0.0
-#   if defined O_mobi_caco3
-      rnpp_C_dop(:) = 0.0
-#   endif
 #   if defined O_mobi_silicon
       rnpp_Diat_dop(:) = 0.0
       rdisopl(:) = 0.0
@@ -694,12 +667,6 @@ c     &,                din15_in
       rexpo_B(:) = 0.0          !ballast detritus
       rgraz_Det_B(:) = 0.0
       rremi_B(:) = 0.0
-#  endif
-#  if defined O_mobi_caco3
-      rnpp_C(:) = 0.0
-      rgraz_C(:) = 0.0
-      rmorp_C(:) = 0.0
-      rmorpt_C(:) = 0.0
 #  endif
 #  if defined O_mobi_silicon
       rnpp_Diat(:) = 0.0
@@ -715,9 +682,6 @@ c     &,                din15_in
       rdeffe(:) = 0.0
       rfeprime(:) = 0.0
       rfecol(:) = 0.0
-#    if defined O_mobi_caco3
-      rdeffe_C(:) = 0.0
-#    endif
 #    if defined O_mobi_silicon
       rdeffe_Diat(:) = 0.0
 #    endif
@@ -762,6 +726,8 @@ CSPKKK still need to implement passing in sil_in when O_mobi_silicon is defined
 c         dissk0 =(1-(CO3-CO3/Omega_c))/(kcal+(CO3-CO3/Omega_C))
 c         dissk1 = min(1.,max(0.,dissk0)) ! Andreas
          dissk1 = dissk0*max(0.,(1.-Omega_c)) ! Andreas 11 d^-1 from Gehlen 2006 
+!AAA add omega dependence of calcite production
+         capr = caprmax*max(0.,(Omega_c - 1.)/(kcapr + Omega_c - 1.)) ! Gehlen et al. (2007, BGS) eq. (3)
 #  endif
 #  if defined O_mobi_silicon
          opl_disk1 = opl_disk0 ! Andreas constant dissolution rate
@@ -778,12 +744,9 @@ cAAA add opal
 # if defined O_mobi_nitrogen
      &        + max(tnpzd(k,imobidiaz), trcmin)*dzt(k)
 # endif
-# if defined O_mobi_caco3
-     &        + max(tnpzd(k,imobicocc), trcmin)*dzt(k)         
-# endif     
-#  if defined O_mobi_silicon
+# if defined O_mobi_silicon
      &        + max(tnpzd(k,imobidiat), trcmin)*dzt(k)
-#  endif
+# endif
 # if defined O_mobi_caco3     
          caco3in = caco3in + tnpzd(k,imobicaco3)*dzt(k)         
          impocaco3 = expocaco3*dztr(k)
@@ -804,7 +767,9 @@ cAAA add opal
 #  endif
 # if defined O_mobi_o2
          bctz = (0.5*(tanh(o2_in(k) - 8.)+1))
-     &        *bbio**(cbio*min(t_in(k),20.))
+c     &        *bbio**(cbio*min(t_in(k),20.))
+cAAA remove limit
+     &        *bbio**(cbio*t_in(k))
 !        decrease remineralisation rate in oxygen minimum zone
          nud = nud0*(0.65+0.35*tanh(o2_in(k) - 3.0))         
 # else
@@ -850,17 +815,10 @@ cAAA add opal
 #  if defined O_mobi_nitrogen
      &,                 npp_D, npp_D_dop, graz_D, morp_D, morpt_D
      &,                 npp_dop
-#   if defined O_mobi_caco3
-     &,                 npp_C_dop
-#   endif
 #   if defined O_mobi_silicon
      &,                 npp_Diat_dop
 #   endif
 #  endif
-#  if defined O_mobi_caco3
-     &,                 npp_C, morpt_C, graz_C
-     &,                 morp_C
-#  endif        
 #  if defined O_mobi_extra_diagnostics
      &,                 avej, avej_D, gmax, no3P
      &,                 po4P, po4_D
@@ -881,9 +839,6 @@ cAAA add opal
 #  if defined O_mobi_iron_diagnostics
      &,                 feorgads, thetamax, deffe
      &,                 feprime, fecol
-#   if defined O_mobi_caco3
-     &,                 deffe_C, thetamax_C
-#   endif         
 #   if defined O_mobi_silicon
      &,                 deffe_Diat, thetamax_Diat
 #   endif         
@@ -944,9 +899,6 @@ c     juan: use o2_in(k) instead of t(i,k,j,io2,taum1)
          rmorp_D(k) = morp_D*rnbio
          rmorpt_D(k) = morpt_D*rnbio
          rnfix(k) = nfix(k)*rnbio
-#   if defined O_mobi_caco3
-         rnpp_C_dop(k) = npp_C_dop*rnbio
-#   endif
 #   if defined O_mobi_silicon
          rdisopl(k) = opl_dis*rnbio
          rproopl(k) = opl_pro*rnbio
@@ -958,12 +910,6 @@ c     juan: use o2_in(k) instead of t(i,k,j,io2,taum1)
          rexpo_B(k) = expo_B  !ballast detritus
          rgraz_Det_B(k) = graz_Det_B*rnbio
          rremi_B(k) = remi_B*rnbio
-#  endif
-#  if defined O_mobi_caco3
-         rnpp_C(k) = npp_C*rnbio
-         rgraz_C(k) = graz_C*rnbio
-         rmorp_C(k) = morp_C*rnbio
-         rmorpt_C(k) = morpt_C*rnbio
 #  endif
 #   if defined O_mobi_silicon
          rnpp_Diat(k) = npp_Diat*rnbio
@@ -979,9 +925,6 @@ c     juan: use o2_in(k) instead of t(i,k,j,io2,taum1)
          rdeffe(k) = deffe*rnbio
          rfeprime(k) = feprime*rnbio
          rfecol(k) = fecol*rnbio
-#    if defined O_mobi_caco3
-         rdeffe_C(k) = deffe_C*rnbio
-#    endif         
 #    if defined O_mobi_silicon
          rdeffe_Diat(k) = deffe_Diat*rnbio
 #    endif         
@@ -1128,8 +1071,8 @@ c         if (zt(k) .le. 200000.) sg_bdeni = sgbdfac*sg_bdeni
          src(k,iszoopn15) = snpzd(imobizoopn15)
          src(k,isdetrn15) = snpzd(imobidetrn15)
          src(k,isdiazn15) = snpzd(imobidiazn15)
-#   if defined O_mobi_caco3
-         src(k,iscoccn15) = snpzd(imobicoccn15)
+#   if defined O_mobi_silicon
+         src(k,isdiatn15) = snpzd(imobidiatn15)
 #   endif         
 #  endif
 # endif
@@ -1142,13 +1085,14 @@ c         if (zt(k) .le. 200000.) sg_bdeni = sgbdfac*sg_bdeni
          src(k,isdoc13) = snpzd(imobidoc13)
          src(k,isdiazc13) = snpzd(imobidiazc13)
 #  endif         
+#  if defined O_mobi_silicon
+         src(k,isdiatc13) = snpzd(imobidiatc13)
+#  endif
 #  if defined O_mobi_caco3
-         src(k,iscoccc13) = snpzd(imobicoccc13)
          src(k,iscaco3c13) = snpzd(imobicaco3c13)
 #  endif
 # endif
 # if defined O_mobi_caco3
-         src(k,iscocc) = snpzd(imobicocc)
          src(k,iscaco3) = snpzd(imobicaco3)
 # endif
 # if defined O_kk_ballast
@@ -1329,7 +1273,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
          src(k,isdic) = src(k,isdic)
      &        + rdissl(k)*1.e-3
      &        - rcalpro(k)*1.e-3
-     &        - rcalatt(k)*1.e-3
 #  else
          src(k,isdic) = src(k,isdic) + prca*rcak(k)
 #  endif
@@ -1338,7 +1281,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
          src(k,isdic13) = src(k,isdic13)
      &        + rdissl(k)*1.e-3*rtcaco3c13(k) ! AS
      &        - rcalpro(k)*1.e-3*rtdic13(k)
-     &        - rcalatt(k)*1.e-3*rtdic13(k)
 #   else              
          src(k,isdic13) = src(k,isdic13) + prca13*rcak(k)
 #   endif
@@ -1349,7 +1291,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
          src(k,isalk) = src(k,isalk)
      &        + 2.*rdissl(k)*1.e-3
      &        - 2.*rcalpro(k)*1.e-3
-     &        - 2.*rcalatt(k)*1.e-3
 #  else
          src(k,isalk) = src(k,isalk) + 2.*prca*rcak(k)
 #  endif
@@ -1361,7 +1302,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
       src(kmx,isdic) = src(kmx,isdic)
      &     + rdissl(kmx)*1.e-3
      &     - rcalpro(kmx)*1.e-3
-     &     - rcalatt(kmx)*1.e-3
      &     + rexpocaco3(kmx)*1.e-3
 #  else
 #   if defined O_sed
@@ -1375,7 +1315,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
       src(kmx,isdic13) = src(kmx,isdic13)
      &                 + rdissl(kmx)*1.e-3*rtcaco3c13(kmx)
      &                 - rcalpro(kmx)*1.e-3*rtdic13(kmx)
-     &                 - rcalatt(kmx)*1.e-3*rtdic13(kmx)
      &                 + rexpocaco3(kmx)*1.e-3*rtcaco3c13(kmx)       
 #   else  
       src(kmx,isdic13) = src(kmx,isdic13) + prca13*rcab(kmx)
@@ -1387,7 +1326,6 @@ c         rtdic13(k) = max(dic13_in(k),trcmin*rc13std/(1+rc13std))
       src(kmx,isalk) = src(kmx,isalk)
      &               + 2.*rdissl(kmx)*1.e-3
      &               - 2.*rcalpro(kmx)*1.e-3
-     &               - 2.*rcalatt(kmx)*1.e-3
      &               + 2.*rexpocaco3(kmx)*1.e-3
 #  else
       src(kmx,isalk) = src(kmx,isalk) + 2.*prca*rcab(kmx)
@@ -1472,16 +1410,9 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
 #  if defined O_mobi_nitrogen
      &,                    npp_Dout, npp_D_dopout, graz_Dout, morp_Dout
      &,                    morpt_Dout, npp_dopout
-#   if defined O_mobi_caco3
-     &,                    npp_C_dopout
-#   endif
 #   if defined O_mobi_silicon
      &,                    npp_Diat_dopout
 #   endif
-#  endif
-#  if defined O_mobi_caco3
-     &,                    npp_Cout, morpt_Cout,graz_Cout
-     &,                    morp_Cout
 #  endif
 #  if defined O_mobi_extra_diagnostics
      &,                    avej_out, avej_D_out, gmax_out, no3P_out
@@ -1503,9 +1434,6 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
 #  if defined O_mobi_iron_diagnostics
      &,                    feorgadsout, thetamaxout, deffeout
      &,                    feprimeout, fecolout
-#   if defined O_mobi_caco3
-     &,                    deffeout_C, thetamaxout_C
-#   endif  
 #   if defined O_mobi_silicon
      &,                    deffeout_Diat, thetamaxout_Diat
 #   endif  
@@ -1546,6 +1474,7 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
 !     Karen Kvale has included prognostic equations for CaCO3, coccolithphores, and
 !     ballast described in
 !     Kvale et al. 2015 Atmos.-Ocean 53, doi:10.1080/07055900.2015.1049112
+!     Andreas has removed coccs
 !
 !     Levin Nickelsen has written the iron model:
 !     Nickelsen et al. 2015, Geosc. Model Dev. 8, 1357-1381, doi:10.5194/gmd-8-1357-2015
@@ -1656,12 +1585,9 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       real graz_Det_out_B, graz_Det_B, g_Det_B, biod_B, dig_Det_B
       real graz_Z_B, graz_C_B, morp_C_B, morz_B, excr_Det_B, sf_Det_B
 
-      real biococc,jmax_C,u_C,avej_C,gd_C,npp_C,npp_Cout,morp_C,morpt_C
-      real nuct,g_C,coccflag,graz_C,graz_Cout,morp_Cout,coccn15flag
-      real morpt_Cout, ing_C, gl_C, limP_C, dig_C, excr_C, sf_C
-      real dopupt_C_flag, dopupt_C, npp_C_dopout, biococcn15,rtcoccn15
-      real biococcc13, coccc13flag, rtcoccc13, biocaco3c13, caco3c13flag
-      real rtcaco3c13
+      real diatn15flag, biodiatn15, rtdiatn15
+      real biodiatc13, diatc13flag, rtdiatc13
+      real biocaco3c13, caco3c13flag, rtcaco3c13
 
       real caco3flag, wwc, expocaco3
       real expocaco3out,calpro,calproout
@@ -1726,8 +1652,8 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       biozoopn15 = bioin(imobizoopn15)
       biodetrn15 = bioin(imobidetrn15)
       biodiazn15 = bioin(imobidiazn15)
-#   if defined O_mobi_caco3
-      biococcn15 = bioin(imobicoccn15)
+#   if defined O_mobi_silicon
+      biodiatn15 = bioin(imobidiatn15)
 #   endif      
 #  endif
 # endif
@@ -1740,13 +1666,14 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       biodoc13 = bioin(imobidoc13)
       biodiazc13 = bioin(imobidiazc13)
 #  endif
+#  if defined O_mobi_silicon
+      biodiatc13 = bioin(imobidiatc13)
+#  endif
 #  if defined O_mobi_caco3
-      biococcc13 = bioin(imobicoccc13)
       biocaco3c13 = bioin(imobicaco3c13)
 #  endif
 # endif
 # if defined O_mobi_caco3
-      biococc = bioin(imobicocc)
       biocaco3 = bioin(imobicaco3)
 # endif
 # if defined O_kk_ballast
@@ -1786,10 +1713,9 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       detrc13flag = 1.
       diazc13flag = 1.
       dfeflag = 1.
-      coccflag = 1.
       detrfeflag = 1.
-      coccn15flag = 1.
-      coccc13flag = 1.      
+      diatn15flag = 1.
+      diatc13flag = 1.      
       caco3c13flag = 1.      
 # if defined O_mobi_nitrogen
       dopflag = 0.5 + sign(0.5,biodop - trcmin)      
@@ -1800,9 +1726,9 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       din15flag = 0.5 + sign(0.5, biodin15 - trcmin)
       don15flag = 0.5 + sign(0.5, biodon15 - trcmin)
       phytn15flag = 0.5 + sign(0.5, biophytn15 - trcmin)
-#   if defined O_mobi_caco3
-      coccn15flag = 0.5 + sign(0.5, biococcn15 - trcmin)
-#   endif      
+#   if defined O_mobi_silicon
+      diatn15flag = 0.5 + sign(0.5, biodiatn15 - trcmin)
+#   endif
       zoopn15flag = 0.5 + sign(0.5, biozoopn15 - trcmin)
       detrn15flag = 0.5 + sign(0.5, biodetrn15 - trcmin)
       diazn15flag = 0.5 + sign(0.5, biodiazn15 - trcmin)
@@ -1811,8 +1737,10 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
 # if defined O_carbon_13
       dic13flag = 0.5 + sign(0.5,biodic13 - trcmin)
       phytc13flag = 0.5 + sign(0.5,biophytc13 - trcmin)
+#  if defined O_mobi_silicon
+      diatc13flag = 0.5 + sign(0.5,biodiatc13 - trcmin)
+#  endif      
 #  if defined O_mobi_caco3
-      coccc13flag = 0.5 + sign(0.5,biococcc13 - trcmin)
       caco3c13flag = 0.5 + sign(0.5,biocaco3c13 - trcmin)
 #  endif      
       zoopc13flag = 0.5 + sign(0.5,biozoopc13 - trcmin)
@@ -1830,7 +1758,6 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       dflag_B = 0.5 + sign(0.5,biod_B - trcmin)
 # endif
 # if defined O_mobi_caco3
-      coccflag = 0.5 + sign(0.5,biococc - trcmin)
       caco3flag = 0.5 + sign(0.5,biocaco3 - trcmin)
 # endif
 # if defined O_mobi_silicon
@@ -1857,8 +1784,8 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       biodin15 = max(biodin15, trcmin)
       biodon15 = max(biodon15, trcmin)
       biophytn15 = max(biophytn15, trcmin)
-#   if defined O_mobi_caco3
-      biococcn15 = max(biococcn15, trcmin)
+#   if defined O_mobi_silicon
+      biodiatn15 = max(biodiatn15, trcmin)
 #   endif      
       biozoopn15 = max(biozoopn15, trcmin)
       biodetrn15 = max(biodetrn15, trcmin)
@@ -1868,8 +1795,10 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
 # if defined O_carbon_13
       biodic13 = max(biodic13, trcmin)
       biophytc13 = max(biophytc13, trcmin)
+#   if defined O_mobi_silicon
+      biodiatc13 = max(biodiatc13, trcmin)
+#   endif 
 #   if defined O_mobi_caco3
-      biococcc13 = max(biococcc13, trcmin)
       biocaco3c13 = max(biocaco3c13, trcmin)
 #   endif 
       biozoopc13 = max(biozoopc13, trcmin)
@@ -1883,7 +1812,6 @@ c      src(kmx,issil) = src(kmx,issil) + expo_op*dztr(kmx) !put the leftovers ba
       biod_B = max(biod_B, trcmin)
 # endif
 # if defined O_mobi_caco3
-      biococc = max(biococc, trcmin)
       biocaco3 = max(biocaco3, trcmin)      
 # endif
 # if defined O_mobi_silicon
@@ -1905,15 +1833,6 @@ CAAA I've moved this block from above and replaced bioin(itrc) with biotrc
       thetamax = thetamaxlo + (thetamaxhi - thetamaxlo)*deffe
       alpha_O = alphamin + (alphamax - alphamin)*deffe
       gl_O = gl*thetamax*alpha_O
-#  if defined O_mobi_caco3
-      p1 = min(biococc, pmax_C) !calcifiers
-      p2 = max(0.0, biococc-pmax_C)
-      kfevar_C = (kfemin_C*p1 + kfemax_C*p2)/(p1 + p2) 
-      deffe_C = biodfe/(kfevar_C + biodfe)
-      thetamax_C = thetamaxlo + (thetamaxhi - thetamaxlo)*deffe_C
-      alpha_C = alphamin + (alphamax - alphamin)*deffe_C
-      gl_C = gl*thetamax_C*alpha_C
-#  endif
 #  if defined O_mobi_silicon
 CAAA I added variable iron half sat
       p1 = min(biodiat, pmax_Diat) !diatoms
@@ -1941,9 +1860,6 @@ c      deffe_Diat = biodfe/(kfe_Diat + biodfe)
       kirr=-kw - kc*(biophyt
 #  if defined O_mobi_nitrogen        
      &     + biodiaz
-#  endif
-#  if defined O_mobi_caco3
-     &     + biococc
 #  endif
 #  if defined O_mobi_silicon
      &     + biodiat
@@ -2000,25 +1916,6 @@ c     &     - kc_o*bioopl
       avej_D = gd_D*(phi1 - phi2)/(-kirr*dzt)
 # endif
 
-# if defined O_mobi_caco3
-#  if defined O_mobi_iron
-      jmax_C = abio_C*bct*deffe_C
-#  else
-      jmax_C = abio_C*bct
-#  endif
-      gd_C = jmax_C*dayfrac
-#  if defined O_mobi_iron
-      u1 = max(gl_C/gd_C,1.e-6)
-#  else
-      u1 = max(gl/gd_C,1.e-6)
-#  endif
-      u2 = u1*f1
-!     for the following approximation ensure that u1 < 20
-      phi1 = log(u1+sqrt(1.+u1**2.))-(sqrt(1.+u1**2.)-1.)/u1
-      phi2 = log(u2+sqrt(1.+u2**2.))-(sqrt(1.+u2**2.)-1.)/u2
-      avej_C = gd_C*(phi1 - phi2)/(-kirr*dzt)
-# endif
-
 # if defined O_mobi_silicon
 #  if defined O_mobi_iron
       jmax_Diat = abiodiat*bct*deffe_Diat
@@ -2060,12 +1957,6 @@ c     &     - kc_o*bioopl
 # endif
       calproout = 0.0
 # if defined O_mobi_caco3
-      nuct = nuct0*bct
-      npp_Cout = 0.0
-      graz_Cout = 0.0
-      morp_Cout = 0.0
-      morpt_Cout = 0.0
-      calattout = 0.0
       disslout = 0.0
       expocaco3out = 0.0
 # endif
@@ -2101,9 +1992,6 @@ c     &     - kc_o*bioopl
       graz_Dout = 0.0
       morpt_Dout = 0.0
       morp_Dout = 0.0
-#    if defined O_mobi_caco3
-      npp_C_dopout = 0.0
-#    endif
 #    if defined O_mobi_silicon
       npp_Diat_dopout = 0.0
 #    endif
@@ -2114,9 +2002,6 @@ c     &     - kc_o*bioopl
       deffeout = 0.0
       feprimeout = 0.0
       fecolout = 0.0
-#    if defined O_mobi_caco3
-      deffeout_C = 0.0
-#    endif
 #    if defined O_mobi_silicon
       deffeout_Diat = 0.0
 #    endif      
@@ -2139,32 +2024,17 @@ c     &     - kc_o*bioopl
         k1n = (knmin*p1+ knmax*p2)/(p1 + p2)
         k1p_P = k1n*redptn
 # if defined O_mobi_iron
-c        p1 = min(biophyt,pmax)
-c        p2 = max(0.0,biophyt - pmax)
         kfevar = (kfemin*p1+ kfemax*p2)/(p1 + p2)
         deffe = biodfe/(kfevar + biodfe)
         jmax = abio_P*bct*deffe
-#  if defined O_mobi_caco3
-        p1 = min(biococc,pmax_C)
-        p2 = max(0.0,biococc - pmax_C)
-        kfevar_C = (kfemin_C*p1 + kfemax_C*p2)/(p1+p2) 
-        k1n_C = (knmin_C*p1 + knmax_C*p2)/(p1 + p2)
-        k1p_C = k1n_C*redptn
-        deffe_C = biodfe/(kfevar_C + biodfe)
-        jmax_C = abio_C*bct*deffe_C
-#  endif
 #  if defined O_mobi_silicon
-CSPKKK should this be kfevar_Diat?
-CAAA I added variable iron half sat
         p1 = min(biodiat, pmax_Diat) !diatoms
         p2 = max(0.0, biodiat-pmax_Diat)
         kfevar_Diat = (kfemin_Diat*p1 + kfemax_Diat*p2)
      &               /(p1 + p2)
-cAAA added variable N half sat
         k1n_Diat = (knmin_Diat*p1 + knmax_Diat*p2)/(p1 + p2)
         k1p_Diat = k1n_Diat*redptn
         deffe_Diat = biodfe/(kfevar_Diat + biodfe)
-c        deffe_Diat = biodfe/(kfe_Diat + biodfe)
         jmax_Diat = abiodiat*bct*deffe_Diat 
 #  endif
 #  if defined O_mobi_nitrogen
@@ -2181,23 +2051,13 @@ c        deffe_Diat = biodfe/(kfe_Diat + biodfe)
         dopupt_flag = 0.5 + sign(0.5, limP_dop - limP_po4)
         limP = limP_dop*dopupt_flag + limP_po4*(1.-dopupt_flag)
         u_P = min(avej, jmax*limP)
-#  if defined O_mobi_caco3
-        limP_dop = hdop*biodop/(k1p_C + biodop)
-        limP_po4 = biopo4/(k1p_C + biopo4)
-        dopupt_C_flag = 0.5 + sign(0.5, limP_dop - limP_po4)
-        limP_C = limP_dop*dopupt_C_flag + limP_po4*(1.-dopupt_C_flag)
-        u_C = min(avej, jmax_C*limP_C)
-#  endif
 #  if defined O_mobi_silicon
-CSPKKK This is not in kk so I've copied the above block; not sure if DOP limitation affects Diat in same way
-!   Si limitation here is a mask unless Si tracer also used
 !       variable half saturation for Si (Aumont et al, 2003) in mmol m-3
-        k1si = 0.8 + 7.2*(biosil/(30.+biosil)) 
+c        k1si = 0.8 + 7.2*(biosil/(30.+biosil)) 
 ! the above leads to small values for k1si and thus almost no Si limitation
 ! anywhere
         k1si = 5.e-3 ! mol m-3
         limSi = biosil/(k1si + biosil)
-cAAA        limSi = 1.
         limP_dop = hdop*biodop/(k1p_Diat + biodop)
         limP_po4 = biopo4/(k1p_Diat + biopo4)
         dopupt_Diat_flag = 0.5 + sign(0.5, limP_dop - limP_po4)
@@ -2209,14 +2069,8 @@ cAAA        limSi = 1.
 # else
         limP = biopo4/(k1p_P + biopo4)
         u_P = min(avej, jmax*limP)        
-#  if defined O_mobi_caco3
-        limP_C = biopo4/(k1p_C + biopo4)
-        u_C = min(avej_C, jmax_C*limP_C)
-#  endif
 #  if defined O_mobi_silicon
-!   Si limitation here is a mask unless Si tracer also used
         limSi = biosil/(k1si + biosil)
-c        limSi = 1.
         limP_Diat = biopo4/(k1p_Diat + biopo4)
         u_Diat = min(avej_Diat, jmax_Diat*limSi)
         u_Diat = min(u_Diat, jmax_Diat*limP_Diat)
@@ -2227,12 +2081,8 @@ c        limSi = 1.
 # if defined O_mobi_nitrogen
 !       nitrate limitation
         u_P = min(u_P, jmax*biono3/(k1n + biono3))
-#  if defined O_mobi_caco3
-        u_C = min(u_C, jmax_C*biono3/(k1n_C + biono3))
-#  endif
 #  if defined O_mobi_silicon
         u_Diat = min(u_Diat, jmax_Diat*biono3/(k1n_Diat + biono3))
-c        u_Diat = u_C
 #  endif
         no3P = jmax*biono3/(k1n + biono3)
 !       growth rate of diazotrophs smaller than other phytoplankton and
@@ -2244,9 +2094,6 @@ c        u_D = u_P
 !       Set the grazing coefficients for the N case
         thetaZ = zprefP*biophyt + zprefDet*biodetr + zprefZ*biozoop
      &         + zprefDiaz*biodiaz + kzoo
-#  if defined O_mobi_caco3
-     &         + zprefC*biococc
-#  endif
 #  if defined O_kk_ballast
      &         + zprefDet*biod_B
 #  endif
@@ -2257,9 +2104,6 @@ c        u_D = u_P
         ing_Det = zprefDet/thetaZ
         ing_Z = zprefZ/thetaZ
         ing_D = zprefDiaz/thetaZ
-#  if defined O_mobi_caco3
-        ing_C = zprefC/thetaZ
-#  endif
 #  if defined O_mobi_silicon
         ing_Diat = zprefDiat/thetaZ
 #  endif
@@ -2268,9 +2112,6 @@ c        u_D = u_P
 !       note kzoo is in terms of N so convert to P
         thetaZ = zprefP*biophyt + zprefDet*biodetr + zprefZ*biozoop 
      &         + kzoo
-#  if defined O_mobi_caco3
-     &         + zprefC*biococc
-#  endif
 #  if defined O_kk_ballast
      &         + zprefDet*biod_B
 #  endif
@@ -2280,30 +2121,18 @@ c        u_D = u_P
         ing_P = zprefP/thetaZ
         ing_Det = zprefDet/thetaZ
         ing_Z = zprefZ/thetaZ
-#  if defined O_mobi_caco3
-        ing_C = zprefC/thetaZ
-#  endif
 #  if defined O_mobi_silicon
         ing_Diat = zprefDiat/thetaZ
 #  endif        
 # endif
         npp = u_P*biophyt
-# if defined O_mobi_caco3
-        npp_C = u_C*biococc
-# endif
 # if defined O_mobi_silicon
         npp_Diat = u_Diat*biodiat
-c        npp_Diat = npp_C
 # endif
 # if defined O_mobi_nitrogen
         dopupt = npp*dopupt_flag        
-#  if defined O_mobi_caco3
-        dopupt_C = npp_C*dopupt_C_flag
-#  endif
-CSPKKK the following block is based on the above block
 #  if defined O_mobi_silicon
         dopupt_Diat = npp_Diat*dopupt_Diat_flag
-c        dopupt_Diat = dopupt_C
 #  endif
         npp_D = max(0.,u_D*biodiaz)
 !       grazing on diazotrophs
@@ -2335,10 +2164,6 @@ c        no3upt_D = biono3/(k1n + biono3)*npp_D ! nitrate uptake
         remi = nud*bct*biodetr
         expo = wwd*biodetr
 # if defined O_mobi_caco3
-        g_C =  gmax*ing_C*biococc
-        graz_C = g_C*biozoop
-        morp_C = nuc*biococc
-        morpt_C = nuct*biococc
         dissl = biocaco3*dissk1
         expocaco3 = wwc*biocaco3
 # endif
@@ -2418,14 +2243,6 @@ c        no3upt_D = biono3/(k1n + biono3)*npp_D ! nitrate uptake
 #  if defined O_mobi_nitrogen_15
      &           *din15flag
 #  endif
-#  if defined O_mobi_caco3
-        npp_C = npp_C*no3flag*(dopupt_C_flag*dopflag
-     &           + (1.-dopupt_C_flag)*po4flag)
-#   if defined O_mobi_nitrogen_15
-     &             *din15flag
-#   endif
-#  endif
-CSPKKK the following block is based on the above block
 #  if defined O_mobi_silicon
         npp_Diat = npp_Diat*no3flag*(dopupt_Diat_flag*dopflag
      &           + (1.-dopupt_Diat_flag)*po4flag)
@@ -2460,10 +2277,6 @@ CSPKKK the following block is based on the above block
 #  endif
 # else
         npp = npp*po4flag
-#  if defined O_mobi_caco3
-        npp_C = npp_C*po4flag
-#  endif
-CSPKKK the following block is based on the above block
 #  if defined O_mobi_silicon
         npp_Diat = npp_Diat*po4flag
 #  endif
@@ -2477,68 +2290,34 @@ CSPKKK the following block is based on the above block
         expo_B = expo_B*dflag_B
 # endif
 # if defined O_mobi_caco3
-c Andreas commented out (don't think we need these)
-c        calpro = calpro*caco3flag*coccflag*zoopflag
-        dissl = dissl*caco3flag ! AS add caco3c13flag
+        dissl = dissl*caco3flag
         expocaco3 = expocaco3*caco3flag
-c        calatt = calatt*caco3flag*coccflag*zoopflag
-        graz_C = graz_C*coccflag
-#  if defined O_mobi_nitrogen_15
-     &        *coccn15flag
-#  endif
-        morp_C = morp_C*coccflag
-#  if defined O_mobi_nitrogen_15
-     &        *coccn15flag
-#  endif
-        morpt_C = morpt_C*coccflag
-#  if defined O_mobi_nitrogen_15
-     &        *coccn15flag
-#  endif
 # endif
-CSPKKK the following block is copied from kk but is probably wrong as it needs to be modified for MOBI
 # if defined O_mobi_silicon
-CASKKK I think this is wrong if DOP update is allowed
-c        npp_Diat = npp_Diat*po4flag*diatflag 
-#  if defined O_mobi_nitrogen
-c     &      *no3flag
-#  endif
-#  if defined O_mobi_iron
-c     &      *dfeflag
-#  endif
         graz_Diat = graz_Diat*diatflag
         morp_Diat = morp_Diat*diatflag
         morpt_Diat = morpt_Diat*diatflag
 # endif
-
 # if defined O_mobi_iron
         remife=remife*detrfeflag
         feorgads=feorgads*dfeflag
         expofe=expofe*detrfeflag
         fecol=fecol*dfeflag
 # endif
-
 !     digestion of grazed material
         dig_P = gamma1*graz
         dig_Z = gamma1*graz_Z
         dig_Det = gamma1*graz_Det
-# if defined O_mobi_caco3
-        dig_C = gamma1*graz_C
-# endif
 # if defined O_kk_ballast
         dig_Det_B = gamma1*graz_Det_B
 # endif        
-CSPKKK the following block is based on the above block
 # if defined O_mobi_silicon
         dig_Diat = gamma1*graz_Diat
 # endif        
         dig = dig_P + dig_Z + dig_Det
-# if defined O_mobi_caco3
-     &      + dig_C
-# endif
 # if defined O_kk_ballast
      &      + dig_Det_B
 # endif        
-CSPKKK the following block is based on the above block
 # if defined O_mobi_silicon
      &      + dig_Diat
 # endif
@@ -2546,9 +2325,6 @@ CSPKKK the following block is based on the above block
         excr_P = gamma1*(1-geZ)*graz
         excr_Z = gamma1*(1-geZ)*graz_Z
         excr_Det = gamma1*(1-geZ)*graz_Det
-# if defined O_mobi_caco3
-        excr_C = gamma1*(1-geZ)*graz_C        
-# endif
 # if defined O_kk_ballast
        excr_Det_B = gamma1*(1-geZ)*graz_Det_B        
 # endif
@@ -2557,9 +2333,6 @@ CSPKKK the following block is based on the above block
        excr_Diat = gamma1*(1-geZ)*graz_Diat
 # endif
         excr = excr_P + excr_Z + excr_Det
-# if defined O_mobi_caco3
-     &       + excr_C
-# endif
 # if defined O_kk_ballast
      &       + excr_Det_B
 # endif  
@@ -2570,9 +2343,6 @@ CSPKKK the following block is based on the above block
         sf_P = (1.-gamma1)*graz
         sf_Z = (1.-gamma1)*graz_Z
         sf_Det = (1.-gamma1)*graz_Det
-# if defined O_mobi_caco3
-        sf_C = (1.-gamma1)*graz_C
-# endif
 # if defined O_kk_ballast
         sf_Det_B = (1.-gamma1)*graz_Det_B
 # endif
@@ -2581,9 +2351,6 @@ CSPKKK the following block is based on the above block
         sf_Diat = (1.-gamma1)*graz_Diat
 # endif
         sf = sf_P + sf_Z + sf_Det   
-# if defined O_mobi_caco3
-     &       + sf_C
-# endif
 # if defined O_kk_ballast
      &       + sf_Det_B
 # endif  
@@ -2649,12 +2416,11 @@ CSPKKK the following block is based on the above block
         rtphytn15 = min(rtphytn15, 2.*rn15std/(1+rn15std))
         rtphytn15 = max(rtphytn15, rn15std/(1+rn15std)/2.)
 
-#  if defined O_mobi_caco3
-        rtcoccn15 = biococcn15/biococc
-        rtcoccn15 = min(rtcoccn15, 2.*rn15std/(1+rn15std))
-        rtcoccn15 = max(rtcoccn15, rn15std/(1+rn15std)/2.)
-#  endif        
-CSPKKK should there be a similar block for O_mobi_silicon?
+#  if defined O_mobi_silicon
+        rtdiatn15 = biodiatn15/biodiat
+        rtdiatn15 = min(rtdiatn15, 2.*rn15std/(1+rn15std))
+        rtdiatn15 = max(rtdiatn15, rn15std/(1+rn15std)/2.)
+#  endif
         
         rtzoopn15 = biozoopn15/biozoop
         rtzoopn15 = min(rtzoopn15, 2.*rn15std/(1+rn15std))
@@ -2684,17 +2450,17 @@ CSPKKK should there be a similar block for O_mobi_silicon?
         rtphytc13 = min(rtphytc13, 2.*rc13std/(1+rc13std))
         rtphytc13 = max(rtphytc13, 0.5*rc13std/(1+rc13std))
 
-#  if defined O_mobi_caco3
-        rtcoccc13 = biococcc13/(biococc*redctn)
-        rtcoccc13 = min(rtcoccc13, 2.*rc13std/(1+rc13std))
-        rtcoccc13 = max(rtcoccc13, 0.5*rc13std/(1+rc13std))
+#  if defined O_mobi_silicon
+        rtdiatc13 = biodiatc13/(biodiat*redctn)
+        rtdiatc13 = min(rtdiatc13, 2.*rc13std/(1+rc13std))
+        rtdiatc13 = max(rtdiatc13, 0.5*rc13std/(1+rc13std))
+#  endif        
 
+#  if defined O_mobi_caco3
         rtcaco3c13 = biocaco3c13/biocaco3
         rtcaco3c13 = min(rtcaco3c13, 2.*rc13std/(1+rc13std))
         rtcaco3c13 = max(rtcaco3c13, 0.5*rc13std/(1+rc13std))
-
 #  endif        
-CSPKKK should there be a similar block for O_mobi_silicon?
 
         rtzoopc13 = biozoopc13/(biozoop*redctn)
         rtzoopc13 = min(rtzoopc13, 2.*rc13std/(1+rc13std))
@@ -2716,23 +2482,9 @@ CSPKKK should there be a similar block for O_mobi_silicon?
 #  endif        
 # endif
 # if defined O_mobi_caco3
-!  net formation of attached (living) tests
-!     total primary production by coccs
-        calatt = (npp_C - morpt_C - morp_C - graz_C
-! total growth of zooplankton
-     &         + dig - morz - graz_Z - excr     
-#  if defined O_kk_ballast
-!     &         + graz_Det_B
-#  endif
-#    if defined O_mobi_silicon
-cASKK I think diatoms shouldn't contribute to CaCO3 production
-c     &         + graz_Diat
-#    endif
-! convert to carbon units mmol C
-     &          )*capr*redctn*1.e3
-
-!   formation of detached (dead) tests, or PIC
-        calpro = (sf_C + sf_Z + morp_C + morz)*capr*redctn*1.e3 !stay in mmol
+!       CaCO3 production
+        calpro = ((sf_Z + morz)*capr+(sf_P+morp)*capr)*redctn*1.e3 !stay in mmol
+c        calpro = (sf_C + sf_Z + morp_C + morz)*capr*redctn*1.e3 !stay in mmol
 # else
         calpro = (morp+morz+(graz+graz_Z)*(1.-gamma1))*capr*redctn*1.e3
 # endif
@@ -2747,10 +2499,6 @@ c     &         + graz_Diat
 !       nutrients equation
         biopo4 = biopo4 + dtbio*(redptn*(excr + remi 
      &           + (1.-dfrt)*morpt - (npp-dopupt)
-#  if defined O_mobi_caco3
-     &           + (1.-dfrt)*morpt_C - (npp_C-dopupt_C)
-#  endif
-CSPKKK the following block is based on the above block
 #  if defined O_mobi_silicon
      &           + (1.-dfrt)*morpt_Diat - (npp_Diat-dopupt_Diat)
 #  endif
@@ -2761,10 +2509,6 @@ CSPKKK the following block is based on the above block
 !       DOP equation
         biodop = biodop + dtbio*(redptn*(
      &             dfr*morp + dfrt*morpt - dopupt
-#  if defined O_mobi_caco3
-     &           + dfr*morp_C + dfrt*morpt_C - dopupt_C
-#  endif
-CSPKKK the following block is based on the above block
 #  if defined O_mobi_silicon
      &           + dfr*morp_Diat + dfrt*morpt_Diat - dopupt_Diat
 #  endif
@@ -2781,9 +2525,6 @@ CSPKKK the following block is based on the above block
         biod_B = biod_B + dtbio*(bapr*((1.-dfr)*morp + sf + morz)
      &         - remi_B - graz_Det_B - expo_B + impo_B
      &         + bapr*morp_D*(redntp/diazntp)
-#   if defined O_mobi_caco3
-     &          + bapr*(1.-dfr)*morp_C
-#   endif
 #   if defined O_mobi_silicon
      &          + bapr*(1.-dfr)*morp_Diat
 #   endif
@@ -2791,9 +2532,6 @@ CSPKKK the following block is based on the above block
         biodetr = biodetr + dtbio*((1.-bapr)*((1.-dfr)*morp + sf + morz)
      &          - remi - graz_Det - expo + impo
      &          + (1.-bapr)*morp_D*(redntp/diazntp)
-#   if defined O_mobi_caco3
-     &          + (1.-bapr)*(1.-dfr)*morp_C
-#   endif
 #   if defined O_mobi_silicon
      &          + (1.-bapr)*(1.-dfr)*morp_Diat
 #   endif
@@ -2801,9 +2539,6 @@ CSPKKK the following block is based on the above block
 #  else        
         biodetr = biodetr + dtbio*((1.-dfr)*morp + sf + morz - remi 
      &          - graz_Det - expo + impo + morp_D*(redntp/diazntp)
-#   if defined O_mobi_caco3
-     &          + (1.-dfr)*morp_C
-#   endif
 #   if defined O_mobi_silicon
      &          + (1.-dfr)*morp_Diat
 #   endif
@@ -2814,9 +2549,6 @@ CSPKKK the following block is based on the above block
 !       DIC equation
         biodic = biodic + dtbio*redctn*(excr + remi 
      &         + (1.-dfrt)*morpt - npp 
-#   if defined O_mobi_caco3
-     &         + (1.-dfrt)*morpt_C - npp_C
-#   endif
 #   if defined O_mobi_silicon
      &         + (1.-dfrt)*morpt_Diat - npp_Diat
 #   endif
@@ -2827,9 +2559,6 @@ CSPKKK the following block is based on the above block
 !       nitrate (NO3) equation
         biono3 = biono3 + dtbio*(excr + remi   
      &         + (1.-dfrt)*morpt - npp 
-#  if defined O_mobi_caco3
-     &         + (1.-dfrt)*morpt_C - npp_C
-#  endif
 #  if defined O_mobi_silicon
      &         + (1.-dfrt)*morpt_Diat - npp_Diat
 #  endif
@@ -2838,9 +2567,6 @@ CSPKKK the following block is based on the above block
      &           )
 !       DON equation
         biodon = biodon + dtbio*(dfr*morp + dfrt*morpt - recy_don
-#  if defined O_mobi_caco3
-     &         + dfr*morp_C + dfrt*morpt_C
-#  endif
 #  if defined O_mobi_silicon
      &         + dfr*morp_Diat + dfrt*morpt_Diat
 #  endif
@@ -2850,9 +2576,6 @@ CSPKKK the following block is based on the above block
 # else
 !       nutrients equation
         biopo4 = biopo4 + dtbio*redptn*(remi + excr - npp + morpt
-#  if defined O_mobi_caco3
-     &         - npp_C + morpt_C
-#  endif
 #  if defined O_mobi_silicon
      &         - npp_Diat + morpt_Diat
 #  endif
@@ -2881,9 +2604,6 @@ CSPKKK the following block is based on the above block
 cAAA this block can be removed if bapr=0 in previous block
         biodetr = biodetr + dtbio*(morp + sf + morz - remi 
      &          - graz_Det - expo + impo
-#   if defined O_mobi_caco3
-     &          + morp_C
-#   endif
 #   if defined O_mobi_silicon
      &          + morp_Diat
 #   endif
@@ -2892,9 +2612,6 @@ cAAA this block can be removed if bapr=0 in previous block
 #  if defined O_carbon
 !     DIC equation
         biodic = biodic + dtbio*redctn*(morpt + excr + remi - npp        
-#   if defined O_mobi_caco3
-     &          + morpt_C - npp_C
-#   endif
 #   if defined O_mobi_silicon
      &          + morpt_Diat - npp_Diat
 #   endif
@@ -2902,12 +2619,6 @@ cAAA this block can be removed if bapr=0 in previous block
 #  endif
 # endif
 # if defined O_mobi_caco3
-!       coccolithophores equation
-        biococc = biococc + dtbio*(npp_C - morp_C - graz_C
-     &       - morpt_C)
-!     calcite equation
-c        biocaco3 = biocaco3 - dissl + dtbio*(calpro-expocaco3+impocaco3)
-c     Andreas put dissl in bracket
         biocaco3 = biocaco3 + dtbio*(calpro-dissl-expocaco3+impocaco3)
 # endif        
 # if defined O_mobi_silicon
@@ -2926,9 +2637,6 @@ c     Andreas put dissl in bracket
      &            - npp + morpt_D - npp_D + recy_don + nr_excr_D 
      &            + morp_D*(1-(redntp/diazntp))) - feorgads 
      &            + remife - fecol
-#   if defined O_mobi_caco3
-     &            + rfeton*((1.-dfrt)*morpt_C - npp_C)
-#   endif
 #   if defined O_mobi_silicon
      &            + rfeton*((1.-dfrt)*morpt_Diat - npp_Diat)
 #   endif
@@ -2937,9 +2645,6 @@ c     Andreas put dissl in bracket
         biodetrfe = biodetrfe + dtbio*(rfeton*(sf + (1.-dfr)*morp
      &            + morp_D*(redntp/diazntp) + morz - graz_Det) 
      &            + feorgads + fecol - remife - expofe + impofe        
-#   if defined O_mobi_caco3
-     &            + rfeton*(1.-dfr)*morp_C
-#   endif
 #   if defined O_mobi_silicon
      &            + rfeton*(1.-dfr)*morp_Diat
 #   endif        
@@ -2947,9 +2652,6 @@ c     Andreas put dissl in bracket
 #  else
         biodfe = biodfe + dtbio*(rfeton*(excr + morpt 
      &            - npp) - feorgads + remife - fecol        
-#   if defined O_mobi_caco3
-     &            + rfeton*(morpt_C - npp_C)
-#   endif
 #   if defined O_mobi_silicon
      &            + rfeton*(morpt_Diat - npp_Diat)
 #   endif
@@ -2958,9 +2660,6 @@ c     Andreas put dissl in bracket
         biodetrfe = biodetrfe + dtbio*(rfeton*(sf + morp
      &             + morz - graz_Det) 
      &            + feorgads + fecol - remife - expofe + impofe
-#   if defined O_mobi_caco3
-     &            + rfeton*morp_C
-#   endif
 #   if defined O_mobi_silicon
      &            + rfeton*morp_Diat
 #   endif
@@ -2973,40 +2672,28 @@ c     Andreas put dissl in bracket
 # if defined O_mobi_nitrogen_15
 !       isotope equations
         biodin15 = biodin15 + dtbio*(rtphytn15*(1.-dfrt)*morpt 
-#  if defined O_mobi_caco3
-     &       + rtcoccn15*(1.-dfrt)*morpt_C - fcassim*npp_C
-#  endif        
 #  if defined O_mobi_silicon
      &       + rtdiatn15*(1.-dfrt)*morpt_Diat - fcassim*npp_Diat
-#  endif        
+#  endif
      &       + fcexcr*excr + rtdiazn15*morpt_D + rtdiazn15*nr_excr_D 
-     &       + rtdiazn15*morp_D*(1-(redntp/diazntp)) + rtdetrn15*remi 
+     &       + rtdiazn15*morp_D*(1.-(redntp/diazntp)) + rtdetrn15*remi 
      &       + fcrecy*recy_don - fcassim*npp - fcassim*no3upt_D)
 
         biodon15 = biodon15 + dtbio*(dfr*rtphytn15*morp 
-#  if defined O_mobi_caco3
-     &       + dfr*rtcoccn15*morp_C + dfrt*rtcoccn15*morpt_C
-#  endif
-#  if defined O_mobi_caco3
+#  if defined O_mobi_silicon
      &       + dfr*rtdiatn15*morp_Diat + dfrt*rtdiatn15*morpt_Diat
 #  endif
      &       + dfrt*rtphytn15*morpt - fcrecy*recy_don)
 
         biophytn15 = biophytn15 + dtbio*(fcassim*npp - rtphytn15*morp 
      &       - rtphytn15*graz - rtphytn15*morpt)
-#  if defined O_mobi_caco3
-        biococcn15 = biococcn15 + dtbio*(fcassim*npp_C-rtcoccn15*morp_C 
-     &       - rtcoccn15*graz_C - rtcoccn15*morpt_C)
-#  endif        
+
 #  if defined O_mobi_silicon
         biodiatn15 = biodiatn15 + dtbio*(fcassim*npp_Diat
      &       - rtdiatn15*morp_Diat - rtdiatn15*graz_Diat 
      &       - rtdiatn15*morpt_Diat)
 #  endif
         biozoopn15 = biozoopn15 + dtbio*(rtphytn15*dig_P 
-#  if defined O_mobi_caco3
-     &       + rtcoccn15*dig_C
-#  endif        
 #  if defined O_mobi_silicon
      &       + rtdiatn15*dig_Diat
 #  endif        
@@ -3014,9 +2701,6 @@ c     Andreas put dissl in bracket
      &       - rtzoopn15*morz - rtzoopn15*graz_Z - fcexcr*excr)
 
         biodetrn15 = biodetrn15 + dtbio*(rtphytn15*(1.-dfr)*morp 
-#  if defined O_mobi_caco3
-     &       + rtcoccn15*(1.-dfr)*morp_C + rtcoccn15*sf_C
-#  endif
 #  if defined O_mobi_silicon
      &       + rtdiatn15*(1.-dfr)*morp_Diat + rtdiatn15*sf_Diat
 #  endif
@@ -3035,18 +2719,12 @@ c     Andreas put dissl in bracket
         biodic13 = biodic13 + dtbio*redctn*(rtphytc13*(1.-dfrt)*morpt 
      &       + rtzoopc13*excr + rtdiazc13*morpt_D + rtdiazc13*nr_excr_D 
      &       + rtdiazc13*morp_D*(1-(redntp/diazntp)) + rtdetrc13*remi 
-#   if defined O_mobi_caco3
-     &       + rtcoccc13*(1.-dfrt)*morpt_C - fcnpp*npp_C
-#   endif        
 #   if defined O_mobi_silicon
      &       + rtdiatc13*(1.-dfrt)*morpt_Diat - fcnpp*npp_Diat
 #   endif        
      &       + rtdoc13*recy_don - fcnpp*npp - fcnpp*npp_D)
 
         biodoc13 = biodoc13 + dtbio*redctn*(dfr*rtphytc13*morp 
-#   if defined O_mobi_caco3
-     &       + rtcoccc13*(dfr*morp_C + dfrt*morpt_C)
-#   endif       
 #   if defined O_mobi_silicon
      &       + rtdiatc13*(dfr*morp_Diat + dfrt*morpt_Diat)
 #   endif       
@@ -3056,9 +2734,6 @@ c     Andreas put dissl in bracket
      &       - rtphytc13*morp - rtphytc13*graz - rtphytc13*morpt)
         
         biozoopc13 = biozoopc13 + dtbio*redctn*(rtphytc13*dig_P 
-#   if defined O_mobi_caco3
-     &      + rtcoccc13*dig_C
-#   endif
 #   if defined O_mobi_silicon
      &      + rtdiatc13*dig_Diat
 #   endif
@@ -3066,9 +2741,6 @@ c     Andreas put dissl in bracket
      &       - rtzoopc13*morz - rtzoopc13*graz_Z - rtzoopc13*excr)
 
         biodetrc13 = biodetrc13 + dtbio*redctn*(rtphytc13*(1.-dfr)*morp 
-#   if defined O_mobi_caco3
-     &       + rtcoccc13*(1.-dfr)*morp_C + rtcoccc13*sf_C
-#   endif
 #   if defined O_mobi_silicon
      &       + rtdiatc13*(1.-dfr)*morp_Diat + rtdiatc13*sf_Diat
 #   endif
@@ -3083,9 +2755,6 @@ c     Andreas put dissl in bracket
 #  else ! no nitrogen
         biodic13 = biodic13 + dtbio*redctn*(rtphytc13*morpt 
      &       + rtzoopc13*excr + rtdetrc13*remi - fcnpp*npp
-#   if defined O_mobi_caco3
-     &       + rtcoccc13*morpt_C - fcnpp*npp_C
-#   endif
 #   if defined O_mobi_silicon
      &       + rtdiatc13*morpt_Diat - fcnpp*npp_Diat
 #   endif
@@ -3095,9 +2764,6 @@ c     Andreas put dissl in bracket
      &       - rtphytc13*(morp + graz + morpt))
         
         biozoopc13 = biozoopc13 + dtbio*redctn*(rtphytc13*dig_P 
-#   if defined O_mobi_caco3
-     &      + rtcoccc13*dig_C
-#   endif        
 #   if defined O_mobi_silicon
      &      + rtdiatc13*dig_Diat
 #   endif        
@@ -3114,9 +2780,6 @@ c     Andreas put dissl in bracket
      &       + rtdiazc13*sf_D
      &       + rtzoopc13*morz - rtdetrc13*remi 
      &       - rtdetrc13*graz_Det - rtdetrc13*expo + rc13impo 
-#   if defined O_mobi_caco3
-     &       + rtcoccc13*morp_C + rtcoccc13*sf_C
-#   endif
 #   if defined O_mobi_silicon
      &       + rtdiatc13*morp_Diat + rtdiatc13*sf_Diat
 #   endif
@@ -3124,8 +2787,6 @@ c     Andreas put dissl in bracket
 
 #  endif
 #  if defined O_mobi_caco3
-        biococcc13 = biococcc13 + dtbio*redctn*(fcnpp*npp_C 
-     &       - rtcoccc13*(morp_C + graz_C + morpt_C))
         biocaco3c13 = biocaco3c13 + dtbio*(rtdic13*calpro
      &       - rtcaco3c13*dissl - rtcaco3c13*expocaco3 
      &                + rcaco3c13impo)
@@ -3176,9 +2837,6 @@ c     Andreas put dissl in bracket
         excrout = excrout + excr
 #  if defined O_mobi_nitrogen
         npp_dopout = npp_dopout + npp*dopupt_flag        
-#   if defined O_mobi_caco3
-        npp_C_dopout = npp_C_dopout + npp_C*dopupt_C_flag  
-#   endif        
 #   if defined O_mobi_silicon
         npp_Diat_dopout = npp_Diat_dopout + npp_Diat*dopupt_Diat_flag  
 #   endif        
@@ -3193,12 +2851,6 @@ c     Andreas put dissl in bracket
         remiout_B = remiout_B + remi_B
         graz_Det_out_B = graz_Det_out_B + graz_Det_B
 #  endif
-#  if defined O_mobi_caco3
-        npp_Cout = npp_Cout + npp_C
-        graz_Cout = graz_Cout + graz_C
-        morp_Cout = morp_Cout + morp_C
-        morpt_Cout = morpt_Cout + morpt_C
-#  endif
 #  if defined O_mobi_silicon
         npp_Diatout = npp_Diatout + npp_Diat
         graz_Diatout = graz_Diatout + graz_Diat
@@ -3211,9 +2863,6 @@ c     Andreas put dissl in bracket
         deffeout = deffeout + deffe
         feprimeout = feprimeout + feprime
         fecolout = fecolout + fecol
-#    if defined O_mobi_caco3
-        deffeout_C = deffeout_C + deffe_C
-#    endif
 #    if defined O_mobi_silicon
         deffeout_Diat = deffeout_Diat + deffe_Diat
         thetamaxout_Diat = thetamax_Diat
@@ -3249,10 +2898,10 @@ c     Andreas put dissl in bracket
      &     don15flag = 0.5 + sign(0.5, biodon15 - trcmin)
         if (phytn15flag .eq. 1) 
      &     phytn15flag = 0.5 + sign(0.5, biophytn15 - trcmin)
-#   if defined O_mobi_caco3
-        if (coccn15flag .eq. 1) 
-     &     coccn15flag = 0.5 + sign(0.5, biococcn15 - trcmin)
-#   endif        
+#   if defined O_mobi_silicon
+        if (diatn15flag .eq. 1) 
+     &     diatn15flag = 0.5 + sign(0.5, biodiatn15 - trcmin)
+#   endif
         if (zoopn15flag .eq. 1)
      &     zoopn15flag = 0.5 + sign(0.5, biozoopn15 - trcmin)
         if (detrn15flag .eq. 1)
@@ -3264,8 +2913,6 @@ c     Andreas put dissl in bracket
 # if defined O_mobi_caco3
         if (caco3flag .eq. 1) 
      &     caco3flag = 0.5 + sign(0.5,biocaco3 - trcmin)
-        if (coccflag .eq. 1) 
-     &     coccflag = 0.5 + sign(0.5,biococc - trcmin)
 #  if defined O_kk_ballast
         if (dflag_B .eq. 1) 
      &     dflag_B = 0.5 + sign(0.5,biod_B - trcmin)
@@ -3289,9 +2936,11 @@ c     Andreas put dissl in bracket
      &       dic13flag = 0.5 + sign(0.5,biodic13 - trcmin)
         if (phytc13flag .eq. 1)
      &       phytc13flag = 0.5 + sign(0.5,biophytc13 - trcmin)
+#  if defined O_mobi_silicon
+        if (diatc13flag .eq. 1)
+     &       diatc13flag = 0.5 + sign(0.5,biodiatc13 - trcmin)
+#  endif
 #  if defined O_mobi_caco3
-        if (coccc13flag .eq. 1)
-     &       coccc13flag = 0.5 + sign(0.5,biococcc13 - trcmin)
         if (caco3c13flag .eq. 1)
      &       caco3c13flag = 0.5 + sign(0.5,biocaco3c13 - trcmin)
 #  endif        
@@ -3327,13 +2976,12 @@ c     Andreas put dissl in bracket
       bioout(imobizoopn15) = biozoopn15 - bioin(imobizoopn15)
       bioout(imobidetrn15) = biodetrn15 - bioin(imobidetrn15)
       bioout(imobidiazn15) = biodiazn15 - bioin(imobidiazn15)
-#   if defined O_mobi_caco3
-      bioout(imobicoccn15) = biococcn15 - bioin(imobicoccn15)      
+#   if defined O_mobi_silicon
+      bioout(imobidiatn15) = biodiatn15 - bioin(imobidiatn15)
 #   endif
 #  endif
 # endif
 # if defined O_mobi_caco3
-      bioout(imobicocc) = biococc - bioin(imobicocc)
       bioout(imobicaco3) = biocaco3 - bioin(imobicaco3)
 #  if defined O_kk_ballast
       bioout(imobidetr_B) = biod_B - bioin(imobidetr_B)
@@ -3357,8 +3005,10 @@ c     Andreas put dissl in bracket
       bioout(imobidoc13) = biodoc13 - bioin(imobidoc13)
       bioout(imobidiazc13) = biodiazc13 - bioin(imobidiazc13)
 #  endif      
+#  if defined O_mobi_silicon
+      bioout(imobidiatc13) = biodiatc13 - bioin(imobidiatc13)
+#  endif
 #  if defined O_mobi_caco3
-      bioout(imobicoccc13) = biococcc13 - bioin(imobicoccc13)
       bioout(imobicaco3c13) = biocaco3c13 - bioin(imobicaco3c13)
 #  endif
 # endif
