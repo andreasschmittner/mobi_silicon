@@ -1,5 +1,7 @@
 # ToDo List  
 for MOBI with Silicon development
+- [ ] output delta values instead of c13 and n15
+- [ ] replace variable half sat function with tanh
 - [ ] test O_save_carbon_carbonate_depth option: this should be a default calculation with CaCO3
 - [ ] check gasbc.F: do we need si as input to co2calc?
 - [ ] check global_sums.F: do we need the si stuff?

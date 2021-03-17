@@ -648,8 +648,8 @@ CSPKKK     accumulate hydrothermal flux and opal burial terms
         enddo
       enddo
 
-#  if defined O_embm      
-#   if defined O_mobi_silicon 
+#  if defined O_embm
+#   if defined O_mobi_silicon
 #    if defined O_kk_si_compensating_sources
 CSPKKK This will not work with TMM. opalburial and silhydrflux as computed above 
 C      are the spatially integrated local (for the current CPU) terms. But we need 
@@ -661,6 +661,7 @@ C      the next time step. Ugh.
 #    else
 	  rivsil = globalsilwflx/globaldisch
 #    endif
+#    if defined O_save_npzd
 	 do j=js,je
 	   jrow = j + joff
 	   do i=is,ie
@@ -675,6 +676,7 @@ c     &                        + rivsil*disch(i,j)*dztr(1)
 		 endif
 	  enddo
 	 enddo 
+#    endif
 #   endif
 #  endif ! O_embm
 # endif

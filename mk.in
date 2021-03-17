@@ -80,15 +80,15 @@ O_mobi_caco3
 O_mobi_nitrogen
 O_mobi_nitrogen_15
 O_mobi_iron
-O_mobi_iron_diagnostics
+#O_mobi_iron_diagnostics
 #O_mobi_no_vflux
 O_mobi_o2
-O_save_npzd
+#O_save_npzd
 #O_mobi_extra_diagnostics
-O_save_kv
+#O_save_kv
 O_tidal_kv
 O_anisotropic_viscosity
-O_save_anisotropic_viscosity
+#O_save_anisotropic_viscosity
 O_anisotropic_zonal_mixing
 
 #SPKKK
